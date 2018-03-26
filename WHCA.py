@@ -34,21 +34,20 @@ def collisionWillOccur(rTable, current, neighbour):
     key_next_time_current_pos = hash(current.g + 1, current.id)
     key_now_time_neighbour_pos = hash(current.g, neighbour.id)
 
-    print("Checking for collision in %d moving to %d" %(current.id, neighbour.id))
+    #print("Checking for collision in %d moving to %d" %(current.id, neighbour.id))
     if key_next_time_neighbour_pos in rTable:
-        print("Next Step is reserved")
+        #print("Next Step is reserved")
         return True
     if key_next_time_current_pos in rTable and key_now_time_neighbour_pos in rTable:
-        print("SWAP collision")
+        #print("SWAP collision")
         return True
-    print("NOT RESERVED")
+    #print("NOT RESERVED")
     return False
     
 
 def findPathAStar(graph, start, target, rTable, W):
     start.g = 0
     start.h = manhattan_distance(start, target)
-    print(start.h)
     start.f = start.h
 
     neighbours = [(0,1),(1,0),(-1,0),(0,-1), (0,0)]
@@ -63,44 +62,16 @@ def findPathAStar(graph, start, target, rTable, W):
         #closed_list.add(current)
 
         if current == target:
-            print("target %d" % (target.id))
-            print("found")
             # target is found, extract the path
-            # path = [target]
-            # next_node = target.came_from
-            # print(next_node.id)
-            # while next_node:
-            #     path.insert(0, next_node)
-            #     last_id = next_node.id
-            #     next_node = next_node.came_from
-            #     if next_node:
-            #         print(next_node.id)
-            # print([x.id for x in path])
-            # return path
             path = [target]
             next_node = target.came_from
-            path.insert(0, next_node)
-            print(next_node.id)
-            next_node = next_node.came_from
-            path.insert(0, next_node)
-            print(next_node.id)
-            next_node = next_node.came_from
-            path.insert(0, next_node)
-            print(next_node.id)
-            next_node = next_node.came_from
-            path.insert(0, next_node)
-            print(next_node.id)
-            next_node = next_node.came_from
-            path.insert(0, next_node)
-            print(next_node.id)
-            next_node = next_node.came_from
-            path.insert(0, next_node)
-            print(next_node.id)
-            next_node = next_node.came_from
-            path.insert(0, next_node)
-            print(next_node.id)
+            while next_node:
+                path.insert(0, next_node)
+                last_id = next_node.id
+                next_node = next_node.came_from
             print([x.id for x in path])
             return path
+            
 
 
 
@@ -121,9 +92,10 @@ def findPathAStar(graph, start, target, rTable, W):
                 neighbour.g = current.g + 1
                 neighbour.h = manhattan_distance(neighbour, target)
                 neighbour.f = neighbour.g + neighbour.h
+
                 if neighbour == current:
                     neighbour.wait_count += 1
-                else:
+                elif current.f == neighbour.f:
                     neighbour.came_from = current
                 if neighbour not in open_list:
                     heappush(open_list, neighbour)
@@ -147,7 +119,6 @@ def WHCA(graph, agents, W, K):
                     graph[i][j].h = None
                     graph[i][j].f = None
                     graph[i][j].came_from = None
-            print("findPathAStar pos:%d  goal:%d W:%d" %(a.pos.id,a.goal.id, W) )
             path = findPathAStar(graph, a.pos, a.goal,rTable, W)
             for t, value in enumerate(path):
                 if t <= W:
@@ -170,7 +141,10 @@ class Agent(object):
         self.path = None
 
     def move(self, steps):
-        self.pos = self.path[steps]
+        if steps > len(self.path)-1:
+            self.pos = self.path[-1]
+        else:
+            self.pos = self.path[steps]
         if self.pos == self.goal:
             self.reachedGoal = True
 
