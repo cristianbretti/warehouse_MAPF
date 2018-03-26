@@ -19,6 +19,7 @@ class AStarNode(BasicNode):
         self.h = None
         self.f = None
         self.came_from = None
+        self.wait_count = 0
 
     def __lt__(self, other):
         if self.f == None or other.f == None:

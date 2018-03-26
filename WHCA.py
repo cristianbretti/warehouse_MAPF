@@ -1,7 +1,10 @@
 from small_warehouse import warehouse as wh
+from small_warehouse import straight_line as sl
 from create_graphs import create_Astar_graph
 from heapq import *
 from Nodes import *
+from random import shuffle
+import math
 
 # The heuristic used in A* to estimate the h-value
 def manhattan_distance(start, end):
@@ -12,6 +15,21 @@ def manhattan_distance(start, end):
 def hash(a, b):
     return int((a+b)*(a+b+1)/2 + b)
 
+def hash_inverse(value):
+    a = value * 8
+    b = a + 1
+    c = math.sqrt(b)
+    d = c - 1
+    e = d/2
+    w = int(e)
+
+    f = w + 1
+    g = w * f
+    h = g/2
+    y = value - h
+    x = w - y
+    return (x, y)
+
 def findPathAStar(graph, start, target, rTable, W):
     start.g = 0
     start.h = manhattan_distance(start, target)
@@ -20,21 +38,52 @@ def findPathAStar(graph, start, target, rTable, W):
     neighbours = [(0,1),(1,0),(-1,0),(0,-1), (0,0)]
 
     open_list = []
-    closed_list = set()
+    #closed_list = set()
 
     heappush(open_list, start) # add start to open list
 
     while open_list:
         current = heappop(open_list)
-        closed_list.add(current)
+        #closed_list.add(current)
 
         if current == target:
+            print(target.id)
+            print("found")
             # target is found, extract the path
+            # path = [target]
+            # next_node = target.came_from
+            # print(next_node.id)
+            # while next_node:
+            #     path.insert(0, next_node)
+            #     last_id = next_node.id
+            #     next_node = next_node.came_from
+            #     if next_node:
+            #         print(next_node.id)
+            # print([x.id for x in path])
+            # return path
             path = [target]
             next_node = target.came_from
-            while next_node:
-                path.insert(0, next_node)
-                next_node = next_node.came_from
+            path.insert(0, next_node)
+            print(next_node.id)
+            next_node = next_node.came_from
+            path.insert(0, next_node)
+            print(next_node.id)
+            next_node = next_node.came_from
+            path.insert(0, next_node)
+            print(next_node.id)
+            next_node = next_node.came_from
+            path.insert(0, next_node)
+            print(next_node.id)
+            next_node = next_node.came_from
+            path.insert(0, next_node)
+            print(next_node.id)
+            next_node = next_node.came_from
+            path.insert(0, next_node)
+            print(next_node.id)
+            next_node = next_node.came_from
+            path.insert(0, next_node)
+            print(next_node.id)
+            print([x.id for x in path])
             return path
 
 
@@ -45,7 +94,7 @@ def findPathAStar(graph, start, target, rTable, W):
                 # neighbour coordinates are out of the graph
                 continue
             neighbour = graph[x][y]
-            if neighbour.type == NodeType.OBSTACLE or neighbour in closed_list:
+            if neighbour.type == NodeType.OBSTACLE: #or neighbour in closed_list:
                 continue
 
             key = hash(current.g + 1, neighbour.id)
@@ -56,7 +105,10 @@ def findPathAStar(graph, start, target, rTable, W):
                 neighbour.g = current.g + 1
                 neighbour.h = manhattan_distance(neighbour, target)
                 neighbour.f = neighbour.g + neighbour.h
-                neighbour.came_from = current
+                if neighbour == current:
+                    neighbour.wait_count += 1
+                else:
+                    neighbour.came_from = current
                 if neighbour not in open_list:
                     heappush(open_list, neighbour)
 
@@ -71,6 +123,7 @@ def WHCA(graph, agents, W, K):
         if done:
             break
 
+        #shuffle(agents)
         for a in agents:
             for i in range(0, graph.shape[0]):
                 for j in range(0, graph.shape[1]):
@@ -106,9 +159,10 @@ class Agent(object):
 
 
 
-g = create_Astar_graph(wh)
-start = g[1][0]
-target = g[4][3]
-agent_list = [Agent(g[1][0], g[4][3], 1337), Agent(g[0][0], g[3][3], 69)]
+#g = create_Astar_graph(wh)
+#agent_list = [Agent(g[1][0], g[4][3], 1337), Agent(g[0][0], g[3][3], 69)]
+g = create_Astar_graph(sl)
+agent_list = [Agent(g[0][0], g[0][7], 69),Agent(g[0][1], g[0][8], 1337)]
+
 
 WHCA(g, agent_list, 5, 3)
