@@ -5,6 +5,7 @@ from heapq import *
 from Nodes import *
 from random import shuffle
 import math
+import copy
 
 # The heuristic used in A* to estimate the h-value
 def manhattan_distance(start, end):
@@ -43,36 +44,43 @@ def collisionWillOccur(rTable, current, neighbour):
         return True
     #print("NOT RESERVED")
     return False
-    
+
 
 def findPathAStar(graph, start, target, rTable, W):
+    print("                   NEW!!!!!!!")
     start.g = 0
     start.h = manhattan_distance(start, target)
     start.f = start.h
+    start.depth = 0
 
     neighbours = [(0,1),(1,0),(-1,0),(0,-1), (0,0)]
 
     open_list = []
-    #closed_list = set()
+    closed_list = set()
 
     heappush(open_list, start) # add start to open list
 
     while open_list:
+        print("OPEN LIST:")
+        print([x.id for x in open_list])
         current = heappop(open_list)
-        #closed_list.add(current)
+        closed_list.add(current)
 
-        if current == target:
+        if current.depth == W:
+            print("founds")
             # target is found, extract the path
-            path = [target]
-            next_node = target.came_from
+            path = [current]
+            #print("current: %d, t: %d" % (current.id, current.t))
+            next_node = current.came_from
             while next_node:
                 path.insert(0, next_node)
-                last_id = next_node.id
+                #print("current: %d, t: %d" % (next_node.id, next_node.t))
                 next_node = next_node.came_from
-            print([x.id for x in path])
+            for x in path:
+                x.t = 0
             return path
-            
 
+        print("Current: %d, f: %d, g: %d, h: %d, depth: %d, t: %d" % (current.id, current.f, current.g, current.h, current.depth, current.t))
 
 
         for (i,j) in neighbours:
@@ -81,24 +89,37 @@ def findPathAStar(graph, start, target, rTable, W):
                 # neighbour coordinates are out of the graph
                 continue
             neighbour = graph[x][y]
-            if neighbour.type == NodeType.OBSTACLE: #or neighbour in closed_list:
+            if neighbour.coordinates == current.coordinates:
+                #print("adding copy")
+                neighbour = copy.deepcopy(current)
+                neighbour.t += 1
+                #print("curr t: %d, neigh t: %d" % (current.t, neighbour.t))
+                #print("are eq ? : " + str(current == neighbour))
+
+            if neighbour.type == NodeType.OBSTACLE or neighbour in closed_list:
+                print("neighbour %d with t: %d not added becuz in closed or obstacle" % (neighbour.id, neighbour.t))
                 continue
 
 
             if collisionWillOccur(rTable, current, neighbour):
+                print("neighbour %d with t: %d not added becuz collision" % (neighbour.id, neighbour.t))
                 continue
 
-            if neighbour not in open_list or current.g + 1 < neighbour.g:
+            if (neighbour not in open_list or current.g + 1 < neighbour.g) and current.t <= neighbour.t:
                 neighbour.g = current.g + 1
                 neighbour.h = manhattan_distance(neighbour, target)
                 neighbour.f = neighbour.g + neighbour.h
+                neighbour.depth = current.depth + 1
 
-                if neighbour == current:
-                    neighbour.wait_count += 1
-                elif current.f == neighbour.f:
-                    neighbour.came_from = current
+                #if current.f == neighbour.f:
+
+                neighbour.came_from = current
                 if neighbour not in open_list:
                     heappush(open_list, neighbour)
+                else:
+                    print("neighbour %d with t: %d not added later becuz in open_list aldready" % (neighbour.id, neighbour.t))
+            else:
+                print("neighbour %d with t: %d not added becuz not improvemtn ot T value thingy" % (neighbour.id, neighbour.t))
 
 def WHCA(graph, agents, W, K):
     rTable = dict()
@@ -111,7 +132,7 @@ def WHCA(graph, agents, W, K):
         if done:
             break
 
-        #shuffle(agents)
+        shuffle(agents)
         for a in agents:
             for i in range(0, graph.shape[0]):
                 for j in range(0, graph.shape[1]):
@@ -119,6 +140,9 @@ def WHCA(graph, agents, W, K):
                     graph[i][j].h = None
                     graph[i][j].f = None
                     graph[i][j].came_from = None
+                    graph[i][j].depth = 0
+                    graph[i][j].t = 0
+            print(a.id)
             path = findPathAStar(graph, a.pos, a.goal,rTable, W)
             for t, value in enumerate(path):
                 if t <= W:
@@ -126,8 +150,7 @@ def WHCA(graph, agents, W, K):
             a.path = path
         for a in agents:
             a.move(K)
-
-
+            print("agent %d now stands on id %d, coord: (%d, %d)" % (a.id, a.pos.id, a.pos.coordinates[0], a.pos.coordinates[1]))
         rTable = dict()
 
 
@@ -145,15 +168,19 @@ class Agent(object):
             self.pos = self.path[-1]
         else:
             self.pos = self.path[steps]
-        if self.pos == self.goal:
+        if self.pos.coordinates == self.goal.coordinates:
             self.reachedGoal = True
+        else:
+            self.reachedGoal = False
 
 
 
-#g = create_Astar_graph(wh)
-#agent_list = [Agent(g[1][0], g[4][3], 1337), Agent(g[0][0], g[3][3], 69)]
-g = create_Astar_graph(sl)
-agent_list = [Agent(g[0][0], g[0][7], 69),Agent(g[0][1], g[0][8], 1337)]
+g = create_Astar_graph(wh)
+agent_list = [Agent(g[1][0], g[4][3], 1337), Agent(g[0][0], g[3][3], 69)]
+#g = create_Astar_graph(sl)
+#agent_list = [Agent(g[0][0], g[0][7], 69),Agent(g[0][1], g[0][8], 1337)]
 
+for a in agent_list:
+    print("Agent %d starts at %d and wants to get to %d" % (a.id, a.pos.id, a.goal.id))
 
 WHCA(g, agent_list, 5, 3)
