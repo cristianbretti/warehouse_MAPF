@@ -71,13 +71,11 @@ def findPathAStar(graph, start, target, rTable, W):
             while next_node:
                 path.insert(0, next_node)
                 next_node = next_node.came_from
-            for x in path:
-                x.t = 0
             print("Path is:")
             print([x.id for x in path])
             return path
 
-        print("Current: %d, f: %d, g: %d, h: %d, depth: %d, t: %d" % (current.id, current.f, current.g, current.h, current.depth, current.t))
+        print("Current: %d, f: %d, g: %d, h: %d, depth: %d" % (current.id, current.f, current.g, current.h, current.depth))
         if(current.depth == 0):
             if current.came_from:
                 print("      IT HAS IT")
@@ -89,24 +87,35 @@ def findPathAStar(graph, start, target, rTable, W):
                 # neighbour coordinates are out of the graph
                 continue
             neighbour = graph[x][y]
-            if neighbour.coordinates == current.coordinates:
-                # Add a copy of the node with a t value one higher,
-                # this node represents waiting
-                neighbour = copy.deepcopy(current)
-                neighbour.t += 1
 
-            if neighbour.type == NodeType.OBSTACLE or neighbour in closed_list:
+            neighbour = copy.deepcopy(neighbour)
+            if not neighbour.g:
+                print("")
+            neighbour.depth = current.depth + 1
+
+            if neighbour.type == NodeType.OBSTACLE: # or neighbour in closed_list:
                 # neighbour is a obstacle or has already been processed
-                print("neighbour: %d depth: %d, not considered because OBSTACLE or IN CLOSEdLIST" % (neighbour.id, neighbour.depth))
+                print("neighbour: %d depth: %d, not considered because OBSTACLE" % (neighbour.id, neighbour.depth))
                 continue
 
+            if neighbour in closed_list:
+                print("neighbour: %d depth: %d, not considered because IN CLOSEDLIST" % (neighbour.id, neighbour.depth))
+                continue
 
             if collisionWillOccur(rTable, current, neighbour):
                 # can't move to neighbour since another agent is there
                 print("neighbour: %d depth: %d, not considered because COLLISION" % (neighbour.id, neighbour.depth))
                 continue
 
-            if (neighbour not in open_list or current.g + 1 < neighbour.g or current.depth + 1 < neighbour.depth) and current.t <= neighbour.t:
+            if neighbour in open_list:
+                print("neighbour: %d depth: %d NOT IN OPEN LIST " % (neighbour.id, neighbour.depth))
+                for x in open_list:
+                    if x == neighbour:
+                        neighbour = x
+                        break
+
+            print("neighbour: %d depth: %d about " % (neighbour.id, neighbour.depth))
+            if neighbour not in open_list or current.g + 1 < neighbour.g: # and current.t <= neighbour.t:
                 # update or initialize new node
                 if neighbour.coordinates == target.coordinates:
                     neighbour.g = current.g + 0
@@ -114,14 +123,13 @@ def findPathAStar(graph, start, target, rTable, W):
                     neighbour.g = current.g + 1
                 neighbour.h = manhattan_distance(neighbour, target)
                 neighbour.f = neighbour.g + neighbour.h
-                neighbour.depth = current.depth + 1
 
                 # set parent
                 neighbour.came_from = current
 
                 if neighbour not in open_list:
                     # add newly discovered node to open list.
-                    print("Added: %d, f: %d, g: %d, h: %d, depth: %d, t: %d" % (neighbour.id, neighbour.f, neighbour.g, neighbour.h, neighbour.depth, neighbour.t))
+                    print("Added: %d, f: %d, g: %d, h: %d, depth: %d" % (neighbour.id, neighbour.f, neighbour.g, neighbour.h, neighbour.depth))
                     heappush(open_list, neighbour)
 
 def WHCA(graph, agents, W, K):
@@ -145,9 +153,7 @@ def WHCA(graph, agents, W, K):
                     graph[i][j].f = None
                     graph[i][j].came_from = None
                     graph[i][j].depth = 0
-                    graph[i][j].t = 0
-                    print(graph[i][j].id)
-            print(a.id)
+            print("         Finding path for %d" % (a.id))
             path = findPathAStar(graph, a.pos, a.goal,rTable, W)
             for t, value in enumerate(path):
                 if t <= W:
@@ -156,14 +162,6 @@ def WHCA(graph, agents, W, K):
             print("agentd %d is about to walk %d steps on path: " %(a.id, K))
             print([x.id for x in a.path])
             print([x.depth for x in a.path])
-            for x in a.path:
-                # reset
-                x.came_from = None
-                x.depth = 0
-                x.f = None
-                x.g = None
-                x.h = None
-                x.t = 0
 
         for a in agents:
             a.move(K)
@@ -182,17 +180,20 @@ class Agent(object):
         self.actualWalking = []
 
     def move(self, steps):
-        if steps > len(self.path)-1:
-            self.pos = self.path[-1]
-            self.actualWalking = self.actualWalking + self.path
-        else:
-            self.pos = self.path[steps]
-            self.actualWalking = self.actualWalking + self.path[:steps]
+        self.pos = self.path[steps]
+        print(self.pos.id)
+        self.actualWalking += self.path[1:steps+1]
+
         if self.pos.coordinates == self.goal.coordinates:
             self.reachedGoal = True
         else:
             self.reachedGoal = False
 
+        self.pos.g = None
+        self.pos.h = None
+        self.pos.f = None
+        self.pos.came_from = None
+        self.pos.depth = 0
 
 
 g = create_Astar_graph(wh)
@@ -203,7 +204,7 @@ agent_list = [Agent(g[1][0], g[4][3], 1337), Agent(g[0][0], g[3][3], 69)]
 for a in agent_list:
     print("Agent %d starts at %d and wants to get to %d" % (a.id, a.pos.id, a.goal.id))
 
-WHCA(g, agent_list, 10, 5)
+WHCA(g, agent_list, 5, 2)
 
 for a in agent_list:
     print("Agent %d actually walked the path:" % (a.id))
@@ -211,4 +212,4 @@ for a in agent_list:
 
 for i in range(0, len(agent_list[0].actualWalking)):
     if agent_list[0].actualWalking[i] == agent_list[1].actualWalking[i]:
-        print("CRASHASHOAIHWDOAIWHDOAIWH")
+        print("CRASH   ASHOAIHWDOAIWHDOAIWH")

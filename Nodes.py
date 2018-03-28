@@ -19,7 +19,6 @@ class AStarNode(BasicNode):
         self.h = None
         self.f = None
         self.came_from = None
-        self.t = 0
         self.depth = 0
 
     def __lt__(self, other):
@@ -29,7 +28,7 @@ class AStarNode(BasicNode):
             return self.f < other.f
 
     def __eq__(self, other):
-        return (self.id == other.id and self.t == other.t)
+        return (self.id == other.id and self.depth == other.depth)
 
     def __hash__(self):
         return self.id
