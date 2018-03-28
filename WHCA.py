@@ -1,5 +1,6 @@
 from small_warehouse import warehouse as wh
 from small_warehouse import straight_line as sl
+from small_warehouse import backing
 from create_graphs import create_Astar_graph
 from heapq import *
 from Nodes import *
@@ -30,22 +31,38 @@ def hash_inverse(value):
     y = value - h
     x = w - y
     return (x, y)
-def collisionWillOccur(rTable, current, neighbour):
+
+def collisionWillOccur(reservation_table, current, neighbour):
     key_next_time_neighbour_pos = hash(current.depth + 1, neighbour.id)
     key_next_time_current_pos = hash(current.depth + 1, current.id)
     key_now_time_neighbour_pos = hash(current.depth, neighbour.id)
 
-    if key_next_time_neighbour_pos in rTable:
+    if key_next_time_neighbour_pos in reservation_table:
         # Moving to node collision
         return True
-    if key_next_time_current_pos in rTable and key_now_time_neighbour_pos in rTable:
+    if key_next_time_current_pos in reservation_table and key_now_time_neighbour_pos in reservation_table:
         # Swap collision
         return True
     return False
 
+def reset_graph(graph):
+    for i in range(0, graph.shape[0]):
+        for j in range(0, graph.shape[1]):
+            graph[i][j].g = None
+            graph[i][j].h = None
+            graph[i][j].f = None
+            graph[i][j].came_from = None
+            graph[i][j].depth = 0
 
-def findPathAStar(graph, start, target, rTable, W):
-    print("                   NEW!!!!!!!")
+def all_agents_at_target(agents):
+    for a in agents:
+        if not a.reachedGoal:
+            return False
+    return True
+
+
+def findPathAStar(graph, start, target, reservation_table, W):
+    # initialize starting node
     start.g = 0
     start.h = manhattan_distance(start, target)
     start.f = start.h
@@ -56,11 +73,10 @@ def findPathAStar(graph, start, target, rTable, W):
     open_list = []
     closed_list = set()
 
-    heappush(open_list, start) # add start to open list
+    # add start to open list
+    heappush(open_list, start)
 
     while open_list:
-        print("OPEN LIST IS:")
-        print([x.id for x in open_list])
         current = heappop(open_list)
         closed_list.add(current)
 
@@ -71,53 +87,40 @@ def findPathAStar(graph, start, target, rTable, W):
             while next_node:
                 path.insert(0, next_node)
                 next_node = next_node.came_from
-            print("Path is:")
-            print([x.id for x in path])
             return path
-
-        print("Current: %d, f: %d, g: %d, h: %d, depth: %d" % (current.id, current.f, current.g, current.h, current.depth))
-        if(current.depth == 0):
-            if current.came_from:
-                print("      IT HAS IT")
-                print(current.came_from.id)
 
         for (i,j) in neighbours:
             x, y = (current.coordinates[0] + i, current.coordinates[1] + j)
             if x < 0 or x >= graph.shape[0] or y < 0 or y >= graph.shape[1]:
                 # neighbour coordinates are out of the graph
                 continue
-            neighbour = graph[x][y]
 
+            neighbour = graph[x][y]
             neighbour = copy.deepcopy(neighbour)
-            if not neighbour.g:
-                print("")
             neighbour.depth = current.depth + 1
 
-            if neighbour.type == NodeType.OBSTACLE: # or neighbour in closed_list:
-                # neighbour is a obstacle or has already been processed
-                print("neighbour: %d depth: %d, not considered because OBSTACLE" % (neighbour.id, neighbour.depth))
+            if neighbour.type == NodeType.OBSTACLE:
+                # neighbour is not traversable, an obstacle
                 continue
 
             if neighbour in closed_list:
-                print("neighbour: %d depth: %d, not considered because IN CLOSEDLIST" % (neighbour.id, neighbour.depth))
+                # neighbour case has already been considered
                 continue
 
-            if collisionWillOccur(rTable, current, neighbour):
+            if collisionWillOccur(reservation_table, current, neighbour):
                 # can't move to neighbour since another agent is there
-                print("neighbour: %d depth: %d, not considered because COLLISION" % (neighbour.id, neighbour.depth))
                 continue
 
             if neighbour in open_list:
-                print("neighbour: %d depth: %d NOT IN OPEN LIST " % (neighbour.id, neighbour.depth))
+                # make neighbour refer to correct node object
                 for x in open_list:
                     if x == neighbour:
                         neighbour = x
                         break
 
-            print("neighbour: %d depth: %d about " % (neighbour.id, neighbour.depth))
-            if neighbour not in open_list or current.g + 1 < neighbour.g: # and current.t <= neighbour.t:
-                # update or initialize new node
+            if neighbour not in open_list or current.g + 1 < neighbour.g:
                 if neighbour.coordinates == target.coordinates:
+                    # waiting at target is preferred
                     neighbour.g = current.g + 0
                 else:
                     neighbour.g = current.g + 1
@@ -129,44 +132,34 @@ def findPathAStar(graph, start, target, rTable, W):
 
                 if neighbour not in open_list:
                     # add newly discovered node to open list.
-                    print("Added: %d, f: %d, g: %d, h: %d, depth: %d" % (neighbour.id, neighbour.f, neighbour.g, neighbour.h, neighbour.depth))
                     heappush(open_list, neighbour)
 
+
 def WHCA(graph, agents, W, K):
-    rTable = dict()
-    while True:
-        print("                     NEW MAIN LOOP")
-        done = True
-        for a in agents:
-            if not a.reachedGoal:
-                done = False
-                break
-        if done:
-            break
+    reservation_table = dict()
+    while not all_agents_at_target(agents):
 
+        # TODO: shuffle should be round robin!
         shuffle(agents)
+
+        # Find collision free paths for each agent
         for a in agents:
-            for i in range(0, graph.shape[0]):
-                for j in range(0, graph.shape[1]):
-                    graph[i][j].g = None
-                    graph[i][j].h = None
-                    graph[i][j].f = None
-                    graph[i][j].came_from = None
-                    graph[i][j].depth = 0
-            print("         Finding path for %d" % (a.id))
-            path = findPathAStar(graph, a.pos, a.goal,rTable, W)
-            for t, value in enumerate(path):
-                if t <= W:
-                    rTable[hash(value.depth, value.id)] = True
+            reset_graph(graph)
+
+            path = findPathAStar(graph, a.pos, a.goal, reservation_table, W)
+
+            # Reserve path
+            for time, value in enumerate(path):
+                if time <= W:
+                    reservation_table[hash(value.depth, value.id)] = True
+
+            # Save path
             a.path = path
-            print("agentd %d is about to walk %d steps on path: " %(a.id, K))
-            print([x.id for x in a.path])
-            print([x.depth for x in a.path])
 
         for a in agents:
-            a.move(K)
-            print("agent %d now stands on id %d, coord: (%d, %d)" % (a.id, a.pos.id, a.pos.coordinates[0], a.pos.coordinates[1]))
-        rTable = dict()
+            a.move_on_path(K)
+
+        reservation_table = dict()
 
 
 
@@ -179,9 +172,8 @@ class Agent(object):
         self.path = None
         self.actualWalking = []
 
-    def move(self, steps):
+    def move_on_path(self, steps):
         self.pos = self.path[steps]
-        print(self.pos.id)
         self.actualWalking += self.path[1:steps+1]
 
         if self.pos.coordinates == self.goal.coordinates:
@@ -189,6 +181,7 @@ class Agent(object):
         else:
             self.reachedGoal = False
 
+        # reset pos node for next interation
         self.pos.g = None
         self.pos.h = None
         self.pos.f = None
@@ -196,20 +189,22 @@ class Agent(object):
         self.pos.depth = 0
 
 
-g = create_Astar_graph(wh)
-agent_list = [Agent(g[1][0], g[4][3], 1337), Agent(g[0][0], g[3][3], 69)]
+#g = create_Astar_graph(wh)
+#agent_list = [Agent(g[1][0], g[4][3], 1337), Agent(g[0][0], g[3][3], 69)]
 #g = create_Astar_graph(sl)
 #agent_list = [Agent(g[0][0], g[0][7], 69),Agent(g[0][1], g[0][8], 1337)]
+g = create_Astar_graph(backing)
+agent_list = [Agent(g[0][0], g[0][18], 1111),Agent(g[0][18], g[0][0], 2222)]
 
 for a in agent_list:
     print("Agent %d starts at %d and wants to get to %d" % (a.id, a.pos.id, a.goal.id))
 
-WHCA(g, agent_list, 5, 2)
+WHCA(g, agent_list, 8, 4)
 
 for a in agent_list:
-    print("Agent %d actually walked the path:" % (a.id))
+    print("Agent %d walked the path:" % (a.id))
     print([x.id for x in a.actualWalking])
 
 for i in range(0, len(agent_list[0].actualWalking)):
     if agent_list[0].actualWalking[i] == agent_list[1].actualWalking[i]:
-        print("CRASH   ASHOAIHWDOAIWHDOAIWH")
+        print("CRASH!!!!!!!")
