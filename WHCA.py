@@ -1,6 +1,7 @@
 from small_warehouse import warehouse as wh
 from small_warehouse import straight_line as sl
 from small_warehouse import backing
+from small_warehouse import big_warehouse as big
 from create_graphs import create_Astar_graph
 from draw_simulation import draw
 from heapq import *
@@ -190,20 +191,22 @@ class Agent(object):
         self.pos.depth = 0
 
 
-g = create_Astar_graph(wh)
-agent_list = [Agent(g[1][0], g[4][3], 1337), Agent(g[0][0], g[3][3], 69)]
+#g = create_Astar_graph(wh)
+#agent_list = [Agent(g[1][0], g[4][3], 1337), Agent(g[0][0], g[3][3], 69)]
 #g = create_Astar_graph(sl)
 #agent_list = [Agent(g[0][0], g[0][7], 69),Agent(g[0][1], g[0][8], 1337)]
 #g = create_Astar_graph(backing)
 #agent_list = [Agent(g[0][0], g[0][18], 1111),Agent(g[0][18], g[0][0], 2222)]
+g = create_Astar_graph(big)
+agent_list = [Agent(g[0][0], g[8][11], 1), Agent(g[0][11], g[8][0], 2), Agent(g[8][0], g[0][11], 3), Agent(g[8][11], g[0][0], 4)]
 
 for a in agent_list:
     print("Agent %d starts at %d and wants to get to %d" % (a.id, a.pos.id, a.goal.id))
 
-WHCA(g, agent_list, 8, 4)
+WHCA(g, agent_list, 10, 5)
 
 
-draw(agent_list, wh)
+draw(agent_list, g)
 
 for a in agent_list:
     print("Agent %d walked the path:" % (a.id))
