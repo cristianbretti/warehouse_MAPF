@@ -39,7 +39,7 @@ def draw(agent_list, g):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 simulating = False
-                pygame.quit()
+                #pygame.quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     i -= 1
@@ -64,5 +64,5 @@ def draw(agent_list, g):
                 screen.blit(text_id, agent_coordinates)
                 
         pygame.display.flip()
-        #clock.tick(1)
+        clock.tick(30)
         

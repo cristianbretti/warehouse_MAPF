@@ -62,6 +62,10 @@ def all_agents_at_target(agents):
             return False
     return True
 
+def round_robin_shuffle(agents):
+    first_object = agents[0]
+    agents.append(first_object)
+    agents.pop(0)
 
 def findPathAStar(graph, start, target, reservation_table, W):
     # initialize starting node
@@ -141,8 +145,7 @@ def WHCA(graph, agents, W, K):
     reservation_table = dict()
     while not all_agents_at_target(agents):
 
-        # TODO: shuffle should be round robin!
-        shuffle(agents)
+        round_robin_shuffle(agents)
 
         # Find collision free paths for each agent
         for a in agents:
@@ -196,9 +199,10 @@ class Agent(object):
 #g = create_Astar_graph(sl)
 #agent_list = [Agent(g[0][0], g[0][7], 69),Agent(g[0][1], g[0][8], 1337)]
 #g = create_Astar_graph(backing)
-#agent_list = [Agent(g[0][0], g[0][18], 1111),Agent(g[0][18], g[0][0], 2222)]
+#agent_list = [Agent(g[0][0], g[0][18], 1),Agent(g[0][18], g[0][0], 2)]
 g = create_Astar_graph(big)
-agent_list = [Agent(g[0][0], g[8][11], 1), Agent(g[0][11], g[8][0], 2), Agent(g[8][0], g[0][11], 3), Agent(g[8][11], g[0][0], 4)]
+agent_list = [Agent(g[0][0], g[8][11], 1), Agent(g[0][11], g[8][0], 2), Agent(g[8][0], g[0][11], 3), Agent(g[8][11], g[0][0], 4), 
+Agent(g[1][1],g[0][6],5)]
 
 for a in agent_list:
     print("Agent %d starts at %d and wants to get to %d" % (a.id, a.pos.id, a.goal.id))
