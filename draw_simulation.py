@@ -33,23 +33,36 @@ def print_number_of_steps(i):
     screen.blit(textsurface, (0,900))
 
 def draw(agent_list, g):
-    for i in range(0,len(agent_list[0].actualWalking)):
+    simulating = True
+    i = 0
+    while simulating:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                simulating = False
                 pygame.quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    i -= 1
+                if event.key == pygame.K_RIGHT:
+                    i += 1
         clear_screen()
         draw_warehouse(g)
         print_number_of_steps(i)
-        #Draw the new position of the agents
-        for j in range(0,len(agent_list)):
-            agent_coordinates = (width * agent_list[j].actualWalking[i].coordinates[1], height * agent_list[j].actualWalking[i].coordinates[0])
-            agent_target_coordinates = (width * agent_list[j].goal.coordinates[1], height * agent_list[j].goal.coordinates[0])
-            pygame.draw.rect(screen, (0,0,255), pygame.Rect(agent_coordinates[0], agent_coordinates[1], width-10, height-10))
-            pygame.draw.rect(screen, (255, 102, 0), pygame.Rect(agent_target_coordinates[0], agent_target_coordinates[1], width-10, height-10))
-            text_id = id_font.render(str(agent_list[j].id), False, (255, 255, 255))
-            text_goal = id_font.render(str(agent_list[j].id) + " goal", False, (255, 255, 255))
-            screen.blit(text_id, agent_coordinates)
-            screen.blit(text_goal, agent_target_coordinates)
-       
-        clock.tick(1)
+        if 0 <= i < len(agent_list[0].actualWalking):
+            #Draw the new position of the agents
+            for j in range(0,len(agent_list)):
+                agent_coordinates = (width * agent_list[j].actualWalking[i].coordinates[1], height * agent_list[j].actualWalking[i].coordinates[0])
+                agent_target_coordinates = (width * agent_list[j].goal.coordinates[1], height * agent_list[j].goal.coordinates[0])
+
+
+                pygame.draw.rect(screen, (255, 102, 0), pygame.Rect(agent_target_coordinates[0], agent_target_coordinates[1], width-10, height-10))
+                text_goal = id_font.render(str(agent_list[j].id) + " goal", False, (255, 255, 255))
+                screen.blit(text_goal, agent_target_coordinates)
+
+                pygame.draw.rect(screen, (0,0,255), pygame.Rect(agent_coordinates[0], agent_coordinates[1], width-10, height-10))
+                text_id = id_font.render(str(agent_list[j].id), False, (255, 255, 255))
+                screen.blit(text_id, agent_coordinates)
+                
         pygame.display.flip()
+        #clock.tick(1)
+        
