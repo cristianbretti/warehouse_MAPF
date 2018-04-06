@@ -174,8 +174,8 @@ def WHCA(graph, agents, W, K):
 #g = create_Astar_graph(backing)
 #agent_list = [Agent(g[0][0], g[0][18], 1),Agent(g[0][18], g[0][0], 2)]
 g = create_Astar_graph(big)
-agent_list = [Agent(g[0][0], g[8][11], 1), Agent(g[0][11], g[8][0], 2), Agent(g[8][0], g[0][11], 3), Agent(g[8][11], g[0][0], 4), 
-Agent(g[1][1],g[0][6],5)]
+agent_list = [Agent(g[0][0], g[8][11], 1, None), Agent(g[0][11], g[8][0], 2, None), Agent(g[8][0], g[0][11], 3, None), Agent(g[8][11], g[0][0], 4, None), 
+Agent(g[1][1],g[0][6],5, None)]
 
 for a in agent_list:
     print("Agent %d starts at %d and wants to get to %d" % (a.id, a.pos.id, a.goal.id))
