@@ -10,6 +10,7 @@ clock = pygame.time.Clock()
 pygame.font.init()
 myfont = pygame.font.SysFont(pygame.font.get_default_font(), 60)
 id_font = pygame.font.SysFont(pygame.font.get_default_font(), 40)
+small_id_font = pygame.font.SysFont(pygame.font.get_default_font(), 30)
 
 def clear_screen():
     screen.fill((0,0,0))
@@ -20,6 +21,7 @@ def draw_warehouse(g):
         xCord = (width * y)
         yCord = (height * x)
         color = (0,0,0)
+        id_text = str(node.id)
         if node.type == NodeType.DEFAULT:
             color = (0,255,0)
         elif node.type == NodeType.OBSTACLE:
@@ -27,6 +29,8 @@ def draw_warehouse(g):
         elif node.type == NodeType.PICKUP:
             color = (0,0,255)
         pygame.draw.rect(screen, color, pygame.Rect(xCord, yCord, width-10, height-10))
+        text_id = small_id_font.render(id_text, False, (0, 0, 0))
+        screen.blit(text_id, (xCord, yCord))
 
 def print_number_of_steps(i):
     textsurface = myfont.render(str(i), False, (255, 255, 255))
