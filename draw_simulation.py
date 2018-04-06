@@ -2,15 +2,15 @@ import pygame
 import numpy as np
 from Nodes import *
 
-width = 100
-height = 100
+width = 50
+height = 50
 pygame.init()
 screen = pygame.display.set_mode((1920,1080), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 pygame.font.init()
-myfont = pygame.font.SysFont(pygame.font.get_default_font(), 60)
-id_font = pygame.font.SysFont(pygame.font.get_default_font(), 40)
-small_id_font = pygame.font.SysFont(pygame.font.get_default_font(), 30)
+myfont = pygame.font.SysFont(pygame.font.get_default_font(), 30)
+id_font = pygame.font.SysFont(pygame.font.get_default_font(), 20)
+small_id_font = pygame.font.SysFont(pygame.font.get_default_font(), 20)
 
 def clear_screen():
     screen.fill((0,0,0))
@@ -28,6 +28,8 @@ def draw_warehouse(g):
             color = (255,0,0)
         elif node.type == NodeType.PICKUP:
             color = (0,0,255)
+        elif node.type == NodeType.DROPOFF:
+            color = (255,0,255)
         pygame.draw.rect(screen, color, pygame.Rect(xCord, yCord, width-10, height-10))
         text_id = small_id_font.render(id_text, False, (0, 0, 0))
         screen.blit(text_id, (xCord, yCord))
