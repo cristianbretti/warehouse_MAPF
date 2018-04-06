@@ -180,7 +180,7 @@ def main():
     agent_list = [Agent(g[0][0], g[8][11], 1, None), Agent(g[0][11], g[8][0], 2, None), Agent(g[8][0], g[0][11], 3, None), Agent(g[8][11], g[0][0], 4, None), 
     Agent(g[1][1],g[0][6],5, None)]
 
-    #order_list = generate_order_list(g, items, workers)
+    #workers = generate_order_list(g, items, workers)
     for a in agent_list:
         print("Agent %d starts at %d and wants to get to %d" % (a.id, a.pos.id, a.goal.id))
 
