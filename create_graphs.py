@@ -14,7 +14,14 @@ def create_Astar_graph(warehouse):
     graph = np.ndarray((warehouse.shape), dtype=BasicNode)
 
     index = 0
+    item_counter = 0
+    workers = []
+    items = []
     for (i,j), value in np.ndenumerate(warehouse):
             graph[i][j] = AStarNode(index, NodeType(value), (i,j))
+            if value == 2:
+                items.append(graph[i][j]) 
+            if value == 3:
+                workers.append(graph[i][j])
             index += 1
-    return graph
+    return graph, items, workers
