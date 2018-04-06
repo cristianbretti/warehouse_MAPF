@@ -1,11 +1,11 @@
 class Agent(object):
-    def __init__(self, pos, goal, id, pickup):
+    def __init__(self, pos, id):
         self.id = id
-        self.reachedGoal = pos == goal
+        self.reachedGoal = False
         self.pos = pos
-        self.goal = goal
+        self.goal = None
         self.path = None
-        self.pickup = pickup
+        self.pickup = None
         self.walking_path = []
 
     def move_on_path(self, steps):

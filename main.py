@@ -14,7 +14,7 @@ def get_correct_node(pickup_nodes, node_id):
 
 
 def create_workers(drop_off_nodes):
-	workers = [Worker(new_id) for new_id, x in enumerate(drop_off_nodes)]
+	return [Worker(new_id) for new_id, x in enumerate(drop_off_nodes)]
 
 def create_orders(order_input, pickup_nodes):
 	orders = []
@@ -23,6 +23,7 @@ def create_orders(order_input, pickup_nodes):
 		for node_id in order_list:
 			order.append(get_correct_node(pickup_nodes, node_id))
 		orders.append(order)
+	return orders
 
 def distribute_orders(workers, orders):
 	worker_number = 0
@@ -30,6 +31,11 @@ def distribute_orders(workers, orders):
 		workers[worker_number].add_order(orders.pop(0))
 		worker_number = (worker_number + 1) % len(workers)
 
+def create_agents(drop_off_nodes, number_of_agents):
+	agent_list = []
+	for i in range(0, number_of_agents):
+		agent_list.append(Agent(drop_off_nodes[i % len(drop_off_nodes)], i))
+	return agent_list
 
 def main():
 	order_input = small
@@ -41,18 +47,20 @@ def main():
 	orders = create_orders(order_input, pickup_nodes)
 	distribute_orders(workers, orders)
 
+	agents = create_agents(drop_off_nodes, number_of_agents)
+	available_agents = [a for a in agents]
 
-	agent_list = [Agent(graph[1][0], graph[15][25], 1, None), Agent(graph[15][25], graph[1][0], 2, None)]
-    #for a in agent_list:
+	#agents = [Agent(graph[1][0], graph[15][25], 1, None), Agent(graph[15][25], graph[1][0], 2, None)]
+    #for a in agents:
     #   print("Agent %d starts at %d and wants to get to %d" % (a.id, a.pos.id, a.goal.id))
 
-	WHCA(graph, agent_list, 10, 5)
+	#WHCA(graph, agents, 10, 5)
 
 
-	draw(agent_list, graph)
+	#draw(agents, graph)
 
-	for i in range(0, len(agent_list[0].walking_path)):
-		if agent_list[0].walking_path[i] == agent_list[1].walking_path[i]:
+	for i in range(0, len(agents[0].walking_path)):
+		if agents[0].walking_path[i] == agents[1].walking_path[i]:
 			print("CRASH!!!!!!!")
 
 

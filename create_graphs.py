@@ -22,7 +22,6 @@ def create_Astar_graph(warehouse):
             if value == 2:
                 items.append(graph[i][j]) 
             if value == 3:
-                #Might not need the entire Node, maybe a count is enough
                 workers.append(graph[i][j])
             index += 1
     return graph, items, workers

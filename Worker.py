@@ -3,5 +3,5 @@ class Worker(object):
 		self.items = []
 		self.id = new_id
 
-	def add_order(order):
-		items = items + order
+	def add_order(self, order):
+		self.items = self.items + order
