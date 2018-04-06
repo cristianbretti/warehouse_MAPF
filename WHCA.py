@@ -63,9 +63,8 @@ def all_agents_at_target(agents):
     return True
 
 def round_robin_shuffle(agents):
-    first_object = agents[0]
-    agents.append(first_object)
-    agents.pop(0)
+    agents.append(agents.pop(0))
+    
 
 def findPathAStar(graph, start, target, reservation_table, W):
     # initialize starting node
