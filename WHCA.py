@@ -1,7 +1,8 @@
-from small_warehouse import warehouse as wh
+#from small_warehouse import warehouse as wh
 from small_warehouse import straight_line as sl
 from small_warehouse import backing
 from small_warehouse import big_warehouse as big
+from warehouse import warehouse
 from create_graphs import create_Astar_graph
 from draw_simulation import draw
 from heapq import *
@@ -176,13 +177,12 @@ def main():
     #g = create_Astar_graph(backing)
     #agent_list = [Agent(g[0][0], g[0][18], 1),Agent(g[0][18], g[0][0], 2)]
 
-    g, items, workers = create_Astar_graph(big)
-    agent_list = [Agent(g[0][0], g[8][11], 1, None), Agent(g[0][11], g[8][0], 2, None), Agent(g[8][0], g[0][11], 3, None), Agent(g[8][11], g[0][0], 4, None), 
-    Agent(g[1][1],g[0][6],5, None)]
+    g, items, workers = create_Astar_graph(warehouse)
+    agent_list = [Agent(g[1][0], g[15][25], 1, None), Agent(g[15][25], g[1][0], 2, None)]
 
     #workers = generate_order_list(g, items, workers)
-    for a in agent_list:
-        print("Agent %d starts at %d and wants to get to %d" % (a.id, a.pos.id, a.goal.id))
+    #for a in agent_list:
+     #   print("Agent %d starts at %d and wants to get to %d" % (a.id, a.pos.id, a.goal.id))
 
     WHCA(g, agent_list, 10, 5)
 

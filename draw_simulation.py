@@ -2,15 +2,17 @@ import pygame
 import numpy as np
 from Nodes import *
 
-width = 50
-height = 50
+width = 35
+height = 35
+gap = 5
+text_offset = 5
 pygame.init()
 screen = pygame.display.set_mode((1920,1080), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 pygame.font.init()
 myfont = pygame.font.SysFont(pygame.font.get_default_font(), 30)
 id_font = pygame.font.SysFont(pygame.font.get_default_font(), 20)
-small_id_font = pygame.font.SysFont(pygame.font.get_default_font(), 20)
+small_id_font = pygame.font.SysFont(pygame.font.get_default_font(), 15)
 
 def clear_screen():
     screen.fill((0,0,0))
@@ -23,16 +25,16 @@ def draw_warehouse(g):
         color = (0,0,0)
         id_text = str(node.id)
         if node.type == NodeType.DEFAULT:
-            color = (0,255,0)
+            color = (255,255,255)
         elif node.type == NodeType.OBSTACLE:
-            color = (255,0,0)
+            color = (0,0,0)
         elif node.type == NodeType.PICKUP:
-            color = (0,0,255)
+            color = (0,191,255)
         elif node.type == NodeType.DROPOFF:
             color = (255,0,255)
-        pygame.draw.rect(screen, color, pygame.Rect(xCord, yCord, width-10, height-10))
+        pygame.draw.rect(screen, color, pygame.Rect(xCord, yCord, width-gap, height-gap))
         text_id = small_id_font.render(id_text, False, (0, 0, 0))
-        screen.blit(text_id, (xCord, yCord))
+        screen.blit(text_id, (xCord + text_offset, yCord + text_offset))
 
 def print_number_of_steps(i):
     textsurface = myfont.render(str(i), False, (255, 255, 255))
@@ -61,11 +63,11 @@ def draw(agent_list, g):
                 agent_target_coordinates = (width * agent_list[j].goal.coordinates[1], height * agent_list[j].goal.coordinates[0])
 
 
-                pygame.draw.rect(screen, (255, 102, 0), pygame.Rect(agent_target_coordinates[0], agent_target_coordinates[1], width-10, height-10))
+                pygame.draw.rect(screen, (255, 127, 80), pygame.Rect(agent_target_coordinates[0], agent_target_coordinates[1], width-gap, height-gap))
                 text_goal = id_font.render(str(agent_list[j].id) + " goal", False, (255, 255, 255))
                 screen.blit(text_goal, agent_target_coordinates)
 
-                pygame.draw.rect(screen, (0,0,255), pygame.Rect(agent_coordinates[0], agent_coordinates[1], width-10, height-10))
+                pygame.draw.rect(screen, (154, 205, 50), pygame.Rect(agent_coordinates[0], agent_coordinates[1], width-gap, height-gap))
                 text_id = id_font.render(str(agent_list[j].id), False, (255, 255, 255))
                 screen.blit(text_id, agent_coordinates)
                 
