@@ -5,7 +5,7 @@ from Nodes import *
 width = 100
 height = 100
 pygame.init()
-screen = pygame.display.set_mode((1920,1080))
+screen = pygame.display.set_mode((1920,1080), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 pygame.font.init()
 myfont = pygame.font.SysFont(pygame.font.get_default_font(), 60)
@@ -48,10 +48,10 @@ def draw(agent_list, g):
         clear_screen()
         draw_warehouse(g)
         print_number_of_steps(i)
-        if 0 <= i < len(agent_list[0].actualWalking):
+        if 0 <= i < len(agent_list[0].walking_path):
             #Draw the new position of the agents
             for j in range(0,len(agent_list)):
-                agent_coordinates = (width * agent_list[j].actualWalking[i].coordinates[1], height * agent_list[j].actualWalking[i].coordinates[0])
+                agent_coordinates = (width * agent_list[j].walking_path[i].coordinates[1], height * agent_list[j].walking_path[i].coordinates[0])
                 agent_target_coordinates = (width * agent_list[j].goal.coordinates[1], height * agent_list[j].goal.coordinates[0])
 
 

@@ -6,6 +6,7 @@ from create_graphs import create_Astar_graph
 from draw_simulation import draw
 from heapq import *
 from Nodes import *
+from Agent import *
 from random import shuffle
 import math
 import copy
@@ -166,33 +167,6 @@ def WHCA(graph, agents, W, K):
         reservation_table = dict()
 
 
-
-class Agent(object):
-    def __init__(self, pos, goal, id):
-        self.id = id
-        self.reachedGoal = pos == goal
-        self.pos = pos
-        self.goal = goal
-        self.path = None
-        self.actualWalking = []
-
-    def move_on_path(self, steps):
-        self.pos = self.path[steps]
-        self.actualWalking += self.path[1:steps+1]
-
-        if self.pos.coordinates == self.goal.coordinates:
-            self.reachedGoal = True
-        else:
-            self.reachedGoal = False
-
-        # reset pos node for next interation
-        self.pos.g = None
-        self.pos.h = None
-        self.pos.f = None
-        self.pos.came_from = None
-        self.pos.depth = 0
-
-
 #g = create_Astar_graph(wh)
 #agent_list = [Agent(g[1][0], g[4][3], 1337), Agent(g[0][0], g[3][3], 69)]
 #g = create_Astar_graph(sl)
@@ -213,8 +187,8 @@ draw(agent_list, g)
 
 for a in agent_list:
     print("Agent %d walked the path:" % (a.id))
-    print([x.id for x in a.actualWalking])
+    print([x.id for x in a.walking_path])
 
-for i in range(0, len(agent_list[0].actualWalking)):
-    if agent_list[0].actualWalking[i] == agent_list[1].actualWalking[i]:
+for i in range(0, len(agent_list[0].walking_path)):
+    if agent_list[0].walking_path[i] == agent_list[1].walking_path[i]:
         print("CRASH!!!!!!!")
