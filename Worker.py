@@ -4,4 +4,4 @@ class Worker(object):
 		self.id = new_id
 
 	def add_order(self, order):
-		self.items = self.items + order
+		self.items.append(order)

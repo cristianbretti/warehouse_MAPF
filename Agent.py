@@ -1,3 +1,8 @@
+class Pickup(object):
+    def __init__(self, item, worker):
+        self.item = item
+        self.worker = worker
+
 class Agent(object):
     def __init__(self, pos, id):
         self.id = id

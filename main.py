@@ -37,6 +37,26 @@ def create_agents(drop_off_nodes, number_of_agents):
 		agent_list.append(Agent(drop_off_nodes[i % len(drop_off_nodes)], i))
 	return agent_list
 
+#Find the closest item.
+def assign_item_to_agent(agent, workers):
+	agent_pos = agent.pos
+	min_dist = 10**5
+	chosen_worker = None
+	chosen_item = None
+	for worker in workers:
+		if worker.items and worker.items[0]:
+			for item in worker.items[0]:
+				dist = manhattan_distance(agent_pos, item)
+				if dist < min_dist:
+					min_dist = dist
+					chosen_worker = worker
+					chosen_item = item
+	if chosen_worker:
+		agent.pickup = Pickup(chosen_item, chosen_worker)
+		chosen_worker.items[0].remove(chosen_item)
+		return True
+	return False
+
 def main():
 	order_input = small
 	number_of_agents = 5
@@ -50,11 +70,13 @@ def main():
 	agents = create_agents(drop_off_nodes, number_of_agents)
 	available_agents = [a for a in agents]
 
-	#agents = [Agent(graph[1][0], graph[15][25], 1, None), Agent(graph[15][25], graph[1][0], 2, None)]
-    #for a in agents:
-    #   print("Agent %d starts at %d and wants to get to %d" % (a.id, a.pos.id, a.goal.id))
+	available_agents = [a for a in available_agents if not assign_item_to_agent(a, workers)]
 
-	#WHCA(graph, agents, 10, 5)
+	for a in agents:
+		if a.pickup:
+			print("Agent with id:%d has item:%d that belongs to worker:%d" %(a.id, a.pickup.item.id, a.pickup.worker.id))
+
+	#WHCA(graph, agents, W=10, K=5, available_agents, workers)
 
 
 	#draw(agents, graph)
