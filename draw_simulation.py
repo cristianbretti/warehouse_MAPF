@@ -51,24 +51,26 @@ def draw(agent_list, g):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     i -= 1
+                    if i < 0:
+                        i = 0
                 if event.key == pygame.K_RIGHT:
                     i += 1
         clear_screen()
         draw_warehouse(g)
         print_number_of_steps(i)
-        if 0 <= i < len(agent_list[0].walking_path):
-            #Draw the new position of the agents
-            for j in range(0,len(agent_list)):
-                agent_coordinates = (width * agent_list[j].walking_path[i].coordinates[1], height * agent_list[j].walking_path[i].coordinates[0])
-                agent_target_coordinates = (width * agent_list[j].goal.coordinates[1], height * agent_list[j].goal.coordinates[0])
+        #Draw the new position of the agents
+        for a in agent_list:
+            if i < len(a.walking_path):
+                agent_coordinates = (width * a.walking_path[i].coordinates[1], height * a.walking_path[i].coordinates[0])
+                #agent_target_coordinates = (width * a.goal.coordinates[1], height * a.goal.coordinates[0])
 
 
-                pygame.draw.rect(screen, (255, 127, 80), pygame.Rect(agent_target_coordinates[0], agent_target_coordinates[1], width-gap, height-gap))
-                text_goal = id_font.render(str(agent_list[j].id) + " goal", False, (255, 255, 255))
-                screen.blit(text_goal, agent_target_coordinates)
+                #pygame.draw.rect(screen, (255, 127, 80), pygame.Rect(agent_target_coordinates[0], agent_target_coordinates[1], width-gap, height-gap))
+                #text_goal = id_font.render(str(a.id) + " goal", False, (255, 255, 255))
+                #screen.blit(text_goal, agent_target_coordinates)
 
                 pygame.draw.rect(screen, (154, 205, 50), pygame.Rect(agent_coordinates[0], agent_coordinates[1], width-gap, height-gap))
-                text_id = id_font.render(str(agent_list[j].id), False, (255, 255, 255))
+                text_id = id_font.render(str(a.id), False, (255, 255, 255))
                 screen.blit(text_id, agent_coordinates)
                 
         pygame.display.flip()

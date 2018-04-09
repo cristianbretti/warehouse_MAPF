@@ -10,6 +10,27 @@ def manhattan_distance(start, end):
     dist_y = abs(start.coordinates[0] - end.coordinates[0])
     return dist_x + dist_y
 
+#Find the closest item.
+def assign_item_to_agent(agent, workers):
+    agent_pos = agent.pos
+    min_dist = 10**5
+    chosen_worker = None
+    chosen_item = None
+    for worker in workers:
+        if worker.items and worker.items[0]:
+            for item in worker.items[0]:
+                dist = manhattan_distance(agent_pos, item)
+                if dist < min_dist:
+                    min_dist = dist
+                    chosen_worker = worker
+                    chosen_item = item
+    if chosen_worker:
+        agent.pickup = Pickup(chosen_item, chosen_worker)
+        chosen_worker.items[0].remove(chosen_item)
+        return True
+    agent.pickup = None
+    return False
+
 def hash(a, b):
     return int((a+b)*(a+b+1)/2 + b)
 
@@ -50,18 +71,53 @@ def reset_graph(graph):
             graph[i][j].came_from = None
             graph[i][j].depth = 0
 
-def all_agents_at_target(agents):
+def one_agent_has_pickup(agents):
     for a in agents:
-        if not a.reachedGoal:
-            return False
-    return True
+        if a.pickup:
+            return True
+    return False
+
+def agent_is_at_worker(agent, workers):
+    for worker in workers:
+        if agent.pos.coordinates == worker.coordinates:
+            return True
+    return False
+
 
 def round_robin_shuffle(agents):
     agents.append(agents.pop(0))
-    
 
-def findPathAStar(graph, start, target, reservation_table, W):
+def get_target(agent, workers, graph):
+    if not agent.pickup:
+        if not assign_item_to_agent(agent, workers):
+            return None   
+    if agent.pickup.item:
+        return agent.pickup.item
+    else:
+        return graph[agent.pickup.worker.coordinates[0]][agent.pickup.worker.coordinates[1]]
+
+def set_target_to_none(agent):
+    if agent.pickup.item:
+        agent.pickup.item = None
+    else:
+        print("Pickup to None for agent:%d" %(agent.id))
+        agent.pickup = None
+
+def extract_path(current):
+    path = [current]
+    next_node = current.came_from
+    while next_node:
+        path.insert(0, next_node)
+        next_node = next_node.came_from
+    return path
+
+def findPathAStar(graph, agent,start_pos, reservation_table, W, workers, K):
     # initialize starting node
+    start = start_pos
+    target = get_target(agent, workers, graph)
+    if not target:
+        return []
+
     start.g = 0
     start.h = manhattan_distance(start, target)
     start.f = start.h
@@ -75,18 +131,32 @@ def findPathAStar(graph, start, target, reservation_table, W):
     # add start to open list
     heappush(open_list, start)
 
+    reached_target_last_step = False
     while open_list:
         current = heappop(open_list)
         closed_list.add(current)
 
+        #Check if reached goal
+        if current.coordinates == target.coordinates:
+            if not reached_target_last_step:
+                reached_target_last_step = True
+            else:
+                path_so_far = extract_path(current)
+                if len(path_so_far) > K + 1:
+                    agent = copy.deepcopy(agent)
+                set_target_to_none(agent)
+                current_depth = current.depth
+                x = current.coordinates[0]
+                y = current.coordinates[1]
+                reset_graph(graph)
+                next_path = findPathAStar(graph, agent, graph[x][y], reservation_table, W-current_depth, workers, K)
+                return path_so_far + next_path[1:]
+        else:
+            reached_target_last_step = False
+
         if current.depth == W:
             # target is found, extract the path
-            path = [current]
-            next_node = current.came_from
-            while next_node:
-                path.insert(0, next_node)
-                next_node = next_node.came_from
-            return path
+            return extract_path(current)
 
         for (i,j) in neighbours:
             x, y = (current.coordinates[0] + i, current.coordinates[1] + j)
@@ -134,18 +204,34 @@ def findPathAStar(graph, start, target, reservation_table, W):
                     heappush(open_list, neighbour)
 
 
-def WHCA(graph, agents, W, K):
+def WHCA(graph, agents, W, K, workers):
+    for a in agents:
+        assign_item_to_agent(a, workers)
+
+    for a in agents:
+        if a.pickup:
+            print("Agent with id:%d has item:%d that belongs to worker:%d" %(a.id, a.pickup.item.id, a.pickup.worker.id))
+
+
     reservation_table = dict()
-    while not all_agents_at_target(agents):
+    while one_agent_has_pickup(agents):
 
         round_robin_shuffle(agents)
 
         # Find collision free paths for each agent
         for a in agents:
+            if not a.pickup:
+                a.path = []
+                continue
             reset_graph(graph)
 
-            path = findPathAStar(graph, a.pos, a.goal, reservation_table, W)
+            if a.pickup:
+                if a.pickup.item:
+                    print("Target is item:%d" %(a.pickup.item.id))
+                elif a.pickup.worker:
+                    print("Target is worker:%d" %(a.pickup.worker.id))
 
+            path = findPathAStar(graph, a, a.pos, reservation_table, W, workers, K)
             # Reserve path
             for time, value in enumerate(path):
                 if time <= W:
@@ -155,6 +241,8 @@ def WHCA(graph, agents, W, K):
             a.path = path
 
         for a in agents:
+            if not a.pickup and not a.path:
+                continue
             a.move_on_path(K)
 
         reservation_table = dict()
