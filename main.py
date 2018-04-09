@@ -39,7 +39,7 @@ def create_agents(drop_off_nodes, number_of_agents):
 
 def main():
 	order_input = small
-	number_of_agents = 5
+	number_of_agents = 3
 
 	graph, pickup_nodes, drop_off_nodes = create_Astar_graph(warehouse)
 

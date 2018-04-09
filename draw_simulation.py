@@ -72,7 +72,6 @@ def draw(agent_list, g):
                 pygame.draw.rect(screen, (154, 205, 50), pygame.Rect(agent_coordinates[0], agent_coordinates[1], width-gap, height-gap))
                 text_id = id_font.render(str(a.id), False, (255, 255, 255))
                 screen.blit(text_id, agent_coordinates)
-                
+
         pygame.display.flip()
         clock.tick(30)
-        
