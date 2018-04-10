@@ -54,11 +54,15 @@ class Agent(object):
             self.walking_path += self.path[1:]
             if pickup:
                 self.target_path += [pickup.target_list[0].id for x in self.path[1:]]
+            else:
+                self.target_path += [-1 for x in self.path[1:]]
         else:
             self.pos = self.path[steps]
             self.walking_path += self.path[1:steps+1]
             if pickup:
                 self.target_path += [pickup.target_list[0].id for x in self.path[1:steps+1]]
+            else:
+                self.target_path += [-1 for x in self.path[1:steps+1]]
         # reset pos node for next interation
         self.pos.g = None
         self.pos.h = None

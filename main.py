@@ -49,7 +49,7 @@ def main():
 
 	agents = create_agents(drop_off_nodes, number_of_agents)
 
-	WHCA(graph, agents, 20, 10, workers)
+	WHCA(graph, agents, 20, 3, workers)
 
 	for a in agents:
 		print("					NEW AGENT!!")
