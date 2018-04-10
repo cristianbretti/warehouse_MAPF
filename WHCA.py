@@ -257,6 +257,6 @@ def WHCA(graph, agents, W, K, workers):
         for a in agents:
             if not a.pickup and not a.path:
                 continue
-            a.move_on_path(K)
+            a.move_on_path(K, a.pickup)
 
         reservation_table = dict()

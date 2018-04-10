@@ -44,16 +44,21 @@ class Agent(object):
         self.path = None
         self.pickup = None
         self.walking_path = []
+        self.target_path = []
         self.is_copy = False
         self.is_carrying_shelf = False
 
-    def move_on_path(self, steps):
+    def move_on_path(self, steps, pickup):
         if len(self.path) <= steps:
             self.pos = self.path[-1]
             self.walking_path += self.path[1:]
+            if pickup:
+                self.target_path += [pickup.target_list[0].id for x in self.path[1:]]
         else:
             self.pos = self.path[steps]
             self.walking_path += self.path[1:steps+1]
+            if pickup:
+                self.target_path += [pickup.target_list[0].id for x in self.path[1:steps+1]]
         # reset pos node for next interation
         self.pos.g = None
         self.pos.h = None

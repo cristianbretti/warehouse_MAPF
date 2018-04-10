@@ -52,7 +52,9 @@ def main():
 	WHCA(graph, agents, 20, 10, workers)
 
 	for a in agents:
+		print("					NEW AGENT!!")
 		print([x.id for x in a.walking_path])
+		print([x for x in a.target_path])
 
 	draw(agents, graph)
 
