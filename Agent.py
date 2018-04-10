@@ -11,6 +11,7 @@ class Agent(object):
         self.pickup = None
         self.walking_path = []
         self.is_copy = False
+        self.is_carrying_shelf = False
 
     def move_on_path(self, steps):
         if len(self.path) <= steps:

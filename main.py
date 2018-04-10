@@ -49,7 +49,7 @@ def main():
 
 	agents = create_agents(drop_off_nodes, number_of_agents)
 
-	WHCA(graph, agents, 10, 5, workers)
+	WHCA(graph, agents, 20, 10, workers)
 
 	print ([x.id for x in agents[0].walking_path])
 

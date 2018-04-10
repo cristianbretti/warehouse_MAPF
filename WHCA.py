@@ -177,7 +177,7 @@ def findPathAStar(graph, agent,start_pos, reservation_table, W, workers, K):
             neighbour = copy.deepcopy(neighbour)
             neighbour.depth = current.depth + 1
 
-            if neighbour.type == NodeType.OBSTACLE:
+            if neighbour.type == NodeType.OBSTACLE and agent.is_carrying_shelf:
                 # neighbour is not traversable, an obstacle
                 #print("neigbout %d depth %d has OBSTACLE" % (neighbour.id, neighbour.depth))
                 continue
