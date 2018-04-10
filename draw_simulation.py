@@ -40,24 +40,38 @@ def print_number_of_steps(i):
     textsurface = myfont.render(str(i), False, (255, 255, 255))
     screen.blit(textsurface, (0,900))
 
+def print_fps(fps):
+    textsurface = myfont.render(str(fps), False, (255, 255, 255))
+    screen.blit(textsurface, (0,950))
+
 def draw(agent_list, g):
     simulating = True
     i = 0
+    fps = 10
     while simulating:
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            i -= 1
+            if i < 0:
+                i = 0
+        if keys[pygame.K_RIGHT]:
+            i += 1
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 simulating = False
                 #pygame.quit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    i -= 1
-                    if i < 0:
-                        i = 0
-                if event.key == pygame.K_RIGHT:
-                    i += 1
+                if event.key == pygame.K_DOWN:
+                    fps -= 5
+                    if fps <= 5:
+                        fps = 5
+                if event.key == pygame.K_UP:
+                    fps += 5
         clear_screen()
         draw_warehouse(g)
         print_number_of_steps(i)
+        print_fps(fps)
         #Draw the new position of the agents
         for a in agent_list:
             if i < len(a.walking_path):
@@ -74,7 +88,7 @@ def draw(agent_list, g):
                 text_id = id_font.render(str(a.id), False, (255, 255, 255))
                 screen.blit(text_id, agent_coordinates)
                 text_target_id = id_font.render("Agent: " + str(a.id) + " has target:" + str(agent_target_id), False, (255,255,255))
-                screen.blit(text_target_id, (1680, 100 + (100*agent_list.index(a))))
+                screen.blit(text_target_id, (1750, 100 + (50*agent_list.index(a))))
 
         pygame.display.flip()
-        clock.tick(30)
+        clock.tick(fps)
