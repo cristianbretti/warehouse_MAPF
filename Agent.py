@@ -2,18 +2,20 @@ class Pickup(object):
     def __init__(self, item, worker):
         self.target_list = [item, worker, item]
         self.state = 0
-    
-    def other_worker_that_needs_item(self, workers):
+
+    def other_worker_that_needs_item(self, workers, is_copy):
         for worker in workers:
             if worker.items and worker.items[0]:
                 for item in worker.items[0]:
                     if item.id == self.target_list[0].id:
+                        if not is_copy:
+                            worker.items[0].remove(item)
                         return worker
         return None
 
-    def advance_pickup_state(self, workers):
+    def advance_pickup_state(self, workers, is_copy):
         if self.state == 1:
-            other_worker = self.other_worker_that_needs_item(workers)
+            other_worker = self.other_worker_that_needs_item(workers, is_copy)
             if other_worker:
                 self.target_list[1] = other_worker
                 return True
@@ -27,7 +29,7 @@ class Pickup(object):
             self.state += 1
             return True
 
-    
+
 
     def get_target(self):
         return self.target_list[self.state]

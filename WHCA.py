@@ -161,7 +161,7 @@ def findPathAStar(graph, agent,start_pos, reservation_table, W, workers, K):
                     agent = copy.deepcopy(agent)
                     agent.is_copy = True
 
-                if not agent.pickup.advance_pickup_state(workers):
+                if not agent.pickup.advance_pickup_state(workers, agent.is_copy):
                     #Delivered back shelf
                     if not assign_item_to_agent(agent, workers):
                         agent.pickup = None
