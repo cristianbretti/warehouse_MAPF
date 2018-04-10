@@ -3,9 +3,17 @@ class Pickup(object):
         self.target_list = [item, worker, item]
         self.state = 0
     
+    def other_worker_that_needs_item(self, workers):
+        for worker in workers:
+            if worker.items and worker.items[0]:
+                for item in worker.items[0]:
+                    if item.id == self.target_list[0].id:
+                        return worker
+        return None
+
     def advance_pickup_state(self, workers):
         if self.state == 1:
-            other_worker = other_worker_that_needs_item(workers)
+            other_worker = self.other_worker_that_needs_item(workers)
             if other_worker:
                 self.target_list[1] = other_worker
                 return True
@@ -17,14 +25,9 @@ class Pickup(object):
             return False
         else:
             self.state += 1
+            return True
 
-    def other_worker_that_needs_item(self, workers):
-        for worker in workers:
-            if worker.items and worker.items[0]:
-                for item in worker.items[0]:
-                    if item.id == self.target_list[0].id:
-                        return worker
-        return None
+    
 
     def get_target(self):
         return self.target_list[self.state]

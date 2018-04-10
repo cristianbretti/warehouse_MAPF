@@ -166,10 +166,9 @@ def findPathAStar(graph, agent,start_pos, reservation_table, W, workers, K):
                     if not assign_item_to_agent(agent, workers):
                         agent.pickup = None
                         agent.is_carrying_shelf = False
-
                 if agent.pickup:
                     agent.is_carrying_shelf = agent.pickup.is_carrying_shelf()
-                    
+
                 current_depth = current.depth
                 reset_f_val_graph(graph)
                 current.came_from = None
