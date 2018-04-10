@@ -19,12 +19,14 @@ def assign_item_to_agent(agent, workers):
     for worker in workers:
         if worker.items and worker.items[0]:
             for item in worker.items[0]:
-                dist = manhattan_distance(agent_pos, item)
-                if dist < min_dist:
-                    min_dist = dist
-                    chosen_worker = worker
-                    chosen_item = item
+                if not item.booked:
+                    dist = manhattan_distance(agent_pos, item)
+                    if dist < min_dist:
+                        min_dist = dist
+                        chosen_worker = worker
+                        chosen_item = item
     if chosen_worker:
+        chosen_item.booked = True
         agent.pickup = Pickup(chosen_item, chosen_worker)
         if not agent.is_copy:
             chosen_worker.items[0].remove(chosen_item)
@@ -123,9 +125,9 @@ def findPathAStar(graph, agent,start_pos, reservation_table, W, workers, K):
     # initialize starting node
     start = start_pos
 
-    target = get_target(agent, workers, graph)
-    if not target:
+    if not agent.pickup:
         return [start_pos]
+    target = agent.pickup.get_target()
 
     start.g = 0
     start.h = manhattan_distance(start, target)
@@ -158,7 +160,16 @@ def findPathAStar(graph, agent,start_pos, reservation_table, W, workers, K):
                 if len(path_so_far) > K + 1:
                     agent = copy.deepcopy(agent)
                     agent.is_copy = True
-                set_target_to_none(agent)
+
+                if not agent.pickup.advance_pickup_state(workers):
+                    #Delivered back shelf
+                    if not assign_item_to_agent(agent, workers):
+                        agent.pickup = None
+                        agent.is_carrying_shelf = False
+
+                if agent.pickup:
+                    agent.is_carrying_shelf = agent.pickup.is_carrying_shelf()
+                    
                 current_depth = current.depth
                 reset_f_val_graph(graph)
                 current.came_from = None
