@@ -31,6 +31,8 @@ def assign_item_to_agent(agent, workers):
         agent.pickup = Pickup(chosen_item, chosen_worker)
         if not agent.is_copy:
             chosen_worker.items[0].remove(chosen_item)
+            if not chosen_worker.items[0]:
+                chosen_worker.items.pop(0)
         return True
     agent.pickup = None
     return False

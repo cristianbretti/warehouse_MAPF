@@ -10,6 +10,8 @@ class Pickup(object):
                     if item.id == self.target_list[0].id:
                         if not is_copy:
                             worker.items[0].remove(item)
+                            if not worker.items[0]:
+                                worker.items.pop(0)
                         return worker
         return None
 
