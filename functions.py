@@ -1,4 +1,59 @@
 from Agent import *
+from Worker import *
+import numpy as np
+from Nodes import *
+#Init functions
+
+def get_correct_node(pickup_nodes, node_id):
+    for current in pickup_nodes:
+        if current.id == node_id:
+            return current
+    raise Exception('Could not find id:%d in the list of pickup_nodes' %(node_id))
+
+
+def create_workers(drop_off_nodes):
+    return [Worker(node.id, node.coordinates) for node in drop_off_nodes]
+
+def create_orders(order_input, pickup_nodes):
+    orders = []
+    for order_list in order_input:
+        order = []
+        for node_id in order_list:
+            order.append(get_correct_node(pickup_nodes, node_id))
+        orders.append(order)
+    return orders
+
+def distribute_orders(workers, orders):
+    worker_number = 0
+    while orders:
+        workers[worker_number].add_order(orders.pop(0))
+        worker_number = (worker_number + 1) % len(workers)
+
+def create_agents(drop_off_nodes, number_of_agents):
+    agent_list = []
+    for i in range(0, number_of_agents):
+        agent_list.append(Agent(drop_off_nodes[i % len(drop_off_nodes)], i))
+    return agent_list
+
+def create_Astar_graph(warehouse):
+    graph = np.ndarray((warehouse.shape), dtype=BasicNode)
+
+    index = 0
+    item_counter = 0
+    workers = []
+    items = []
+    for (i,j), value in np.ndenumerate(warehouse):
+            graph[i][j] = AStarNode(index, NodeType(value), (i,j))
+            if value == 2:
+                graph[i][j].booked = False
+                items.append(graph[i][j])
+            if value == 3:
+                workers.append(graph[i][j])
+            index += 1
+    return graph, items, workers
+
+
+
 
 # The heuristic used in A* to estimate the h-value
 def manhattan_distance(start, end):
