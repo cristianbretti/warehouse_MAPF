@@ -79,6 +79,12 @@ class Agent(object):
         if len(self.path) > 1:
             self.path.pop(0)
             self.pos = self.path[0]
+            self.walking_path += [self.pos]
+        elif len(self.path) > 0:
+            self.pos = self.path[0]
+            self.walking_path += [self.pos]
+
+
     def done_with_target(self):
         if self.was_at_target:
             self.was_at_target = False

@@ -76,7 +76,7 @@ def draw(agent_list, g):
         for a in agent_list:
             if i < len(a.walking_path):
                 agent_coordinates = (width * a.walking_path[i].coordinates[1], height * a.walking_path[i].coordinates[0])
-                agent_target_id = a.target_path[i]
+                #agent_target_id = a.target_path[i]
                 #agent_target_coordinates = (width * a.goal.coordinates[1], height * a.goal.coordinates[0])
 
 
@@ -87,8 +87,8 @@ def draw(agent_list, g):
                 pygame.draw.rect(screen, (154, 205, 50), pygame.Rect(agent_coordinates[0], agent_coordinates[1], width-gap, height-gap))
                 text_id = id_font.render(str(a.id), False, (255, 255, 255))
                 screen.blit(text_id, agent_coordinates)
-                text_target_id = id_font.render("Agent: " + str(a.id) + " has target:" + str(agent_target_id), False, (255,255,255))
-                screen.blit(text_target_id, (1750, 100 + (50*agent_list.index(a))))
+                #text_target_id = id_font.render("Agent: " + str(a.id) + " has target:" + str(agent_target_id), False, (255,255,255))
+                #screen.blit(text_target_id, (1750, 100 + (50*agent_list.index(a))))
 
         pygame.display.flip()
         clock.tick(fps)

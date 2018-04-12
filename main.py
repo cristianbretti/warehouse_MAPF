@@ -3,7 +3,7 @@ from warehouse import warehouse
 from create_graphs import *
 from Agent import *
 from Worker import *
-#from draw_simulation import draw
+from draw_simulation import draw
 from functions import *
 
 from WHCA import *
@@ -64,7 +64,7 @@ def main():
 		print("cost so far %d" % (cost))
 		print(done)
 
-	#draw(agents, graph)
+	draw(agents, graph)
 
 
 if __name__ == "__main__":

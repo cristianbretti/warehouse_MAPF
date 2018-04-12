@@ -27,8 +27,6 @@ def AStar(graph, agent):
             # target is found, extract the path
             return extract_path(current)
 
-
-
         for (i,j) in neighbours:
             x, y = (current.coordinates[0] + i, current.coordinates[1] + j)
             if x < 0 or x >= graph.shape[0] or y < 0 or y >= graph.shape[1]:
@@ -45,12 +43,3 @@ def AStar(graph, agent):
                 neighbour.came_from = current
                 if neighbour not in open_list:
                     heappush(open_list, neighbour)
-
-
-#
-# g = create_Astar_graph(wh)
-# start = g[1][0]
-# target = g[3][3]
-#
-# path = AStar(g, start, target)
-# print([x.id for x in path])

@@ -1,6 +1,3 @@
-## TEMP:
-from create_graphs import *
-
 from AStar import *
 from functions import *
 
@@ -20,6 +17,7 @@ class Simulation(object):
             if agent.pickup:
                 reset_graph(self.graph)
                 agent.path = AStar(self.graph, agent)
+                agent.walking_path = [agent.pos]
 
     def run(self):
         done = False
