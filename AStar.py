@@ -2,18 +2,11 @@ from small_warehouse import warehouse as wh
 from create_graphs import create_Astar_graph
 from heapq import *
 from Nodes import *
-
-# The heuristic used in A* to estimate the h-value
-def manhattan_distance(start, end):
-    dist_x = abs(start.coordinates[1] - end.coordinates[1])
-    dist_y = abs(start.coordinates[0] - end.coordinates[0])
-    return dist_x + dist_y
+from functions import *
 
 def AStar(graph, agent):
     start = agent.pos
     target = agent.pickup.get_target()
-
-    print("A star for agent %d from %d to %d" % (agent.id, start.id, target.id))
 
     start.g = 0
     start.h = manhattan_distance(start, target)

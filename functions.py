@@ -37,3 +37,20 @@ def one_agent_has_pickup(agents):
         if a.pickup:
             return True
     return False
+
+def reset_graph(graph):
+    for i in range(0, graph.shape[0]):
+        for j in range(0, graph.shape[1]):
+            graph[i][j].g = None
+            graph[i][j].h = None
+            graph[i][j].f = None
+            graph[i][j].came_from = None
+            graph[i][j].depth = 0
+
+def reset_f_val_graph(graph):
+    for i in range(0, graph.shape[0]):
+        for j in range(0, graph.shape[1]):
+            graph[i][j].g = None
+            graph[i][j].h = None
+            graph[i][j].f = None
+            graph[i][j].came_from = None

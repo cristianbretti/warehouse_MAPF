@@ -18,11 +18,11 @@ class Simulation(object):
         self.cost = 0
         for agent in self.agents:
             if agent.pickup:
+                reset_graph(self.graph)
                 agent.path = AStar(self.graph, agent)
 
     def run(self):
         done = False
-        print("here")
         while(not done):
             self.cost += 1
             for agent in self.agents:
@@ -39,6 +39,7 @@ class Simulation(object):
                     if agent.pickup:
                         agent.is_carrying_shelf = agent.pickup.is_carrying_shelf()
 
+                    reset_graph(self.graph)
                     agent.path = AStar(self.graph, agent)
 
             agent1, agent2 = self.agents_will_collide_next_step()
