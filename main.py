@@ -23,14 +23,14 @@ def main():
 	for a in agents:
 		assign_item_to_agent(a, workers)
 
-	#WHCA(graph, agents, 20, 10, workers)
-	sim = Simulation(graph, agents, workers)
-	state, cost, done = sim.run()
+	WHCA(graph, agents, 20, 10, workers)
+	#sim = Simulation(graph, agents, workers)
+	#state, cost, done = sim.run()
 
-	if state:
-		print("crash with agents %d and %d at %d and %d" % (state.agent1.id, state.agent2.id, state.agent1.pos.id, state.agent2.pos.id))
-		print("cost so far %d" % (cost))
-		print(done)
+	# if state:
+	# 	print("crash with agents %d and %d at %d and %d" % (state.agent1.id, state.agent2.id, state.agent1.pos.id, state.agent2.pos.id))
+	# 	print("cost so far %d" % (cost))
+	# 	print(done)
 
 	draw(agents, graph)
 

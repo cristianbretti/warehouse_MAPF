@@ -3,6 +3,7 @@ from Nodes import *
 from functions import *
 
 def AStar(graph, agent):
+    reset_graph(graph)
     start = agent.pos
     target = agent.pickup.get_target()
 

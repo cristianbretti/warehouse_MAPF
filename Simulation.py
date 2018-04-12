@@ -15,7 +15,6 @@ class Simulation(object):
         self.cost = 0
         for agent in self.agents:
             if agent.pickup:
-                reset_graph(self.graph)
                 agent.path = AStar(self.graph, agent)
                 agent.walking_path = [agent.pos]
 
@@ -36,9 +35,9 @@ class Simulation(object):
                             agent.is_carrying_shelf = False
                     if agent.pickup:
                         agent.is_carrying_shelf = agent.pickup.is_carrying_shelf()
-
-                    reset_graph(self.graph)
-                    agent.path = AStar(self.graph, agent)
+                        agent.path = AStar(self.graph, agent)
+                    else:
+                        agent.path = []
 
             agent1, agent2 = self.agents_will_collide_next_step()
             if agent1:
@@ -72,7 +71,6 @@ class Simulation(object):
                 return a1, a2
         return None, None
 
-        
 
     def apply_rule(self, state, rule):
         if rule == 0:
@@ -95,7 +93,8 @@ class Simulation(object):
 
     def apply_wait_rule(self, agent):
         agent.path.insert(0, agent.pos)
-        if self.agent_will_collide_next_step(agent):
+        t1, t2 = self.agent_will_collide_next_step(agent)
+        if t1:
             return False
         return True
 
@@ -114,10 +113,11 @@ class Simulation(object):
                 continue
 
             agent.path = [agent.pos, neighbour]
-            if self.agent_will_collide_next_step(agent):
+            a1, a2 = self.agent_will_collide_next_step(agent)
+            if a1:
                 continue
 
-            new_distance = manhattan_distance(neighbour, agent.pickup.get_target().pos)
+            new_distance = manhattan_distance(neighbour, agent.pickup.get_target())
             if new_distance < min_distance:
                 min_neighbour = neighbour
                 min_distance = new_distance
@@ -162,11 +162,13 @@ class Simulation(object):
                 agent1.path = [agent1.pos, neighbour1]
                 agent2.path = [agent2.pos, neighbour2]
 
-                if self.agent_will_collide_next_step(agent1) or self.agent_will_collide_next_step(agent2):
+                t1, t2 = self.agent_will_collide_next_step(agent1)
+                t3, t4 = self.agent_will_collide_next_step(agent2)
+                if t1 or t3:
                     continue
 
-                new_distance = manhattan_distance(neighbour1, agent1.pickup.get_target().pos)
-                new_distance += manhattan_distance(neighbour2, agent2.pickup.get_target().pos)
+                new_distance = manhattan_distance(neighbour1, agent1.pickup.get_target())
+                new_distance += manhattan_distance(neighbour2, agent2.pickup.get_target())
                 if new_distance < min_distance:
                     min_neighbour1 = neighbour1
                     min_neighbour2 = neighbour2

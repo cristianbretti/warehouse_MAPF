@@ -21,8 +21,10 @@ def main():
 
 		root_simulation = Simulation(graph, agents, workers)
 		root = RuleExpertNode(0, root_simulation)
-		build_tree(root)
-		print(get_rule(root))
+		build_tree(root, 0, False)
+		print(print_tree(root))
+		sim_tree(root)
+
 
 if __name__ == "__main__":
 	main()

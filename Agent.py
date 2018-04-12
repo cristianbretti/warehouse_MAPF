@@ -41,7 +41,7 @@ class Agent(object):
     def __init__(self, pos, id):
         self.id = id
         self.pos = pos
-        self.path = None
+        self.path = []
         self.pickup = None
         self.walking_path = []
         self.target_path = []
