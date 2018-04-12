@@ -53,12 +53,6 @@ def reset_f_val_graph(graph):
             graph[i][j].f = None
             graph[i][j].came_from = None
 
-def one_agent_has_pickup(agents):
-    for a in agents:
-        if a.pickup:
-            return True
-    return False
-
 def round_robin_shuffle(agents):
     agents.append(agents.pop(0))
 
@@ -178,8 +172,6 @@ def findPathAStar(graph, agent,start_pos, reservation_table, W, workers, K):
     print("IMPOSSIBLE PROBLEM")
 
 def WHCA(graph, agents, W, K, workers):
-    for a in agents:
-        assign_item_to_agent(a, workers)
 
     reservation_table = dict()
     while one_agent_has_pickup(agents):

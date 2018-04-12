@@ -18,8 +18,6 @@ class simulation:
     workers
 
     def run():
-        plan_new_paths()
-
         bool done = False
         while(not done):
             for a in agent:
@@ -38,6 +36,7 @@ class simulation:
 
     def apply_rule(int rule):
         move_agents_according_to_rule(rule)
+        plan_new_paths()
 
 
 

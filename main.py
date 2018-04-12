@@ -3,8 +3,11 @@ from warehouse import warehouse
 from create_graphs import *
 from Agent import *
 from Worker import *
+#from draw_simulation import draw
+from functions import *
+
 from WHCA import *
-from draw_simulation import draw
+from Simulation import *
 
 def get_correct_node(pickup_nodes, node_id):
 	for current in pickup_nodes:
@@ -39,19 +42,24 @@ def create_agents(drop_off_nodes, number_of_agents):
 
 def main():
 	order_input = small
-	number_of_agents = 10
+	number_of_agents = 5
 
 	graph, pickup_nodes, drop_off_nodes = create_Astar_graph(warehouse)
 
 	workers = create_workers(drop_off_nodes)
 	orders = create_orders(order_input, pickup_nodes)
 	distribute_orders(workers, orders)
-	
+
 	agents = create_agents(drop_off_nodes, number_of_agents)
 
-	WHCA(graph, agents, 20, 10, workers)
+	for a in agents:
+		assign_item_to_agent(a, workers)
 
-	draw(agents, graph)
+	#WHCA(graph, agents, 20, 10, workers)
+	sim = Simulation(graph, agents, workers)
+	state, cost, done = sim.run()
+
+	#draw(agents, graph)
 
 
 if __name__ == "__main__":

@@ -47,8 +47,11 @@ class Agent(object):
         self.target_path = []
         self.is_copy = False
         self.is_carrying_shelf = False
+        self.was_at_target = False
 
     def move_on_path(self, steps, pickup):
+        "This method is used in WHCA"
+
         if len(self.path) <= steps:
             self.pos = self.path[-1]
             self.walking_path += self.path[1:]
@@ -69,3 +72,20 @@ class Agent(object):
         self.pos.f = None
         self.pos.came_from = None
         self.pos.depth = 0
+
+    def one_step_in_path(self):
+        "This method is used in DKBR"
+
+        if len(self.path) > 0:
+            self.path.pop(0)
+            self.pos = self.path[0]
+    def done_with_target(self):
+        if self.was_at_target:
+            self.was_at_target = False
+            return True
+        elif self.pos == self.pickup.get_target():
+            self.was_at_target = True
+            return False
+        else:
+            self.was_at_target = False
+            return False

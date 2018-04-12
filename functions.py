@@ -31,3 +31,9 @@ def assign_item_to_agent(agent, workers):
         return True
     agent.pickup = None
     return False
+
+def one_agent_has_pickup(agents):
+    for a in agents:
+        if a.pickup:
+            return True
+    return False

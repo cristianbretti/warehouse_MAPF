@@ -9,7 +9,10 @@ def manhattan_distance(start, end):
     dist_y = abs(start.coordinates[0] - end.coordinates[0])
     return dist_x + dist_y
 
-def AStar(graph, start, target):
+def AStar(graph, agent):
+    start = agent.pos
+    target = agent.pickup.get_target()
+
     start.g = 0
     start.h = manhattan_distance(start, target)
     start.f = start.h
@@ -54,10 +57,10 @@ def AStar(graph, start, target):
                     heappush(open_list, neighbour)
 
 
-
-g = create_Astar_graph(wh)
-start = g[1][0]
-target = g[3][3]
-
-path = AStar(g, start, target)
-print([x.id for x in path])
+#
+# g = create_Astar_graph(wh)
+# start = g[1][0]
+# target = g[3][3]
+#
+# path = AStar(g, start, target)
+# print([x.id for x in path])
