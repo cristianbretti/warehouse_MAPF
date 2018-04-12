@@ -1,7 +1,8 @@
 from orders import big_order_list as big
 from warehouse import warehouse
 from functions import *
-
+from rule_expert import *
+from Simulation import *
 
 number_of_agents = 5
 
@@ -18,6 +19,10 @@ def main():
 		for a in agents:
 			assign_item_to_agent(a, workers)
 
+		root_simulation = Simulation(graph, agents, workers)
+		root = RuleExpertNode(0, root_simulation)
+		build_tree(root)
+		print(get_rule(root))
 
 if __name__ == "__main__":
 	main()
