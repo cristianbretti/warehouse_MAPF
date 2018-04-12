@@ -1,39 +1,9 @@
 from heapq import *
 from Nodes import *
 from Agent import *
+from functions import *
 import math
 import copy
-
-# The heuristic used in A* to estimate the h-value
-def manhattan_distance(start, end):
-    dist_x = abs(start.coordinates[1] - end.coordinates[1])
-    dist_y = abs(start.coordinates[0] - end.coordinates[0])
-    return dist_x + dist_y
-
-#Find the closest item.
-def assign_item_to_agent(agent, workers):
-    agent_pos = agent.pos
-    min_dist = 10**5
-    chosen_worker = None
-    chosen_item = None
-    for worker in workers:
-        if worker.items and worker.items[0]:
-            for item in worker.items[0]:
-                if not item.booked:
-                    dist = manhattan_distance(agent_pos, item)
-                    if dist < min_dist:
-                        min_dist = dist
-                        chosen_worker = worker
-                        chosen_item = item
-    if chosen_worker:
-        if not agent.is_copy:
-            chosen_item.booked = True
-        agent.pickup = Pickup(chosen_item, chosen_worker)
-        if not agent.is_copy:
-            chosen_worker.remove_item(chosen_item)
-        return True
-    agent.pickup = None
-    return False
 
 def hash(a, b):
     return int((a+b)*(a+b+1)/2 + b)
@@ -89,30 +59,9 @@ def one_agent_has_pickup(agents):
             return True
     return False
 
-def agent_is_at_worker(agent, workers):
-    for worker in workers:
-        if agent.pos.coordinates == worker.coordinates:
-            return True
-    return False
-
-
 def round_robin_shuffle(agents):
     agents.append(agents.pop(0))
 
-def get_target(agent, workers, graph):
-    if not agent.pickup:
-        if not assign_item_to_agent(agent, workers):
-            return None
-    if agent.pickup.item:
-        return agent.pickup.item
-    else:
-        return graph[agent.pickup.worker.coordinates[0]][agent.pickup.worker.coordinates[1]]
-
-def set_target_to_none(agent):
-    if agent.pickup.item:
-        agent.pickup.item = None
-    else:
-        agent.pickup = None
 
 def extract_path(current):
     path = [current]
