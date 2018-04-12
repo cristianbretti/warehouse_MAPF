@@ -54,3 +54,11 @@ def reset_f_val_graph(graph):
             graph[i][j].h = None
             graph[i][j].f = None
             graph[i][j].came_from = None
+            
+def extract_path(current):
+    path = [current]
+    next_node = current.came_from
+    while next_node:
+        path.insert(0, next_node)
+        next_node = next_node.came_from
+    return path

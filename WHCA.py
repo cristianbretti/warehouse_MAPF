@@ -41,14 +41,6 @@ def round_robin_shuffle(agents):
     agents.append(agents.pop(0))
 
 
-def extract_path(current):
-    path = [current]
-    next_node = current.came_from
-    while next_node:
-        path.insert(0, next_node)
-        next_node = next_node.came_from
-    return path
-
 def findPathAStar(graph, agent,start_pos, reservation_table, W, workers, K):
     # initialize starting node
     start = start_pos

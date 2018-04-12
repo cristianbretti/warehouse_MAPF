@@ -76,14 +76,14 @@ class Agent(object):
     def one_step_in_path(self):
         "This method is used in DKBR"
 
-        if len(self.path) > 0:
+        if len(self.path) > 1:
             self.path.pop(0)
             self.pos = self.path[0]
     def done_with_target(self):
         if self.was_at_target:
             self.was_at_target = False
             return True
-        elif self.pos == self.pickup.get_target():
+        elif self.pos.coordinates == self.pickup.get_target().coordinates:
             self.was_at_target = True
             return False
         else:

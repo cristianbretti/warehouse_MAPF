@@ -23,14 +23,9 @@ def AStar(graph, agent):
         current = heappop(open_list)
         closed_list.add(current)
 
-        if current == target:
+        if current.coordinates == target.coordinates:
             # target is found, extract the path
-            path = [target]
-            next_node = target.came_from
-            while next_node:
-                path.insert(0, next_node)
-                next_node = next_node.came_from
-            return path
+            return extract_path(current)
 
 
 
