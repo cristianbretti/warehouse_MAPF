@@ -39,14 +39,14 @@ def create_agents(drop_off_nodes, number_of_agents):
 
 def main():
 	order_input = small
-	number_of_agents = 3
+	number_of_agents = 10
 
 	graph, pickup_nodes, drop_off_nodes = create_Astar_graph(warehouse)
 
 	workers = create_workers(drop_off_nodes)
 	orders = create_orders(order_input, pickup_nodes)
 	distribute_orders(workers, orders)
-
+	
 	agents = create_agents(drop_off_nodes, number_of_agents)
 
 	WHCA(graph, agents, 20, 10, workers)
