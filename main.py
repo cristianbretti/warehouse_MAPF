@@ -1,6 +1,5 @@
 from orders import small_order_list as small
 from warehouse import warehouse
-from create_graphs import *
 from Agent import *
 from Worker import *
 from draw_simulation import draw

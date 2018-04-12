@@ -1,5 +1,3 @@
-from small_warehouse import warehouse as wh
-from create_graphs import create_Astar_graph
 from heapq import *
 from Nodes import *
 from functions import *
