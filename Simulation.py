@@ -8,15 +8,16 @@ class State(object):
         self.agents = agents
 
 class Simulation(object):
-    def __init__(self, graph, agents, workers):
+    def __init__(self, graph, agents, workers, copy):
         self.graph = graph
         self.agents = agents
         self.workers = workers
         self.cost = 0
-        for agent in self.agents:
-            if agent.pickup:
-                agent.path = AStar(self.graph, agent)
-                agent.walking_path = [agent.pos]
+        if not copy:
+            for agent in self.agents:
+                if agent.pickup:
+                    agent.path = AStar(self.graph, agent)
+                    agent.walking_path = [agent.pos]
 
     def run(self):
         done = False
@@ -47,6 +48,43 @@ class Simulation(object):
 
         return None, self.cost, done
 
+    def one_iteration(self, p=False):
+        done = False
+        self.cost += 1
+        for agent in self.agents:
+            if not agent.pickup:
+                continue
+            agent.one_step_in_path()
+            if p:
+                print("agent%d just stepped and now has path" % (agent.id))
+                print([x.id for x in agent.path])
+
+            if agent.done_with_target():
+                print("agent%d was done with target" % (agent.id))
+                if not agent.pickup.advance_pickup_state(self.workers, agent.is_copy):
+                    #Delivered back shelf
+                    print("agent%d delivered back a SHELF" % (agent.id))
+                    if not assign_item_to_agent(agent, self.workers):
+                        agent.pickup = None
+                        agent.is_carrying_shelf = False
+                if agent.pickup:
+                    print("agent%d STILL HAS A PICKUP" % (agent.id))
+                    agent.is_carrying_shelf = agent.pickup.is_carrying_shelf()
+                    print("agent %d is_carrying_shelf: %d" % (agent.id, agent.is_carrying_shelf))
+                    agent.path = AStar(self.graph, agent, True)
+                    print("agent %d new path is:" % (agent.id))
+                    print([x.id for x in agent.path])
+                else:
+                    agent.path = []
+
+        agent1, agent2 = self.agents_will_collide_next_step()
+        if agent1:
+            return State(agent1, agent2, self.agents), self.cost, done
+
+        done = not one_agent_has_pickup(self.agents)
+
+        return None, self.cost, done
+
     def agent_will_collide_next_step(self, agent):
         for j in range(0, len(self.agents)):
             other = self.agents[j]
@@ -54,11 +92,11 @@ class Simulation(object):
                 continue
             if len(agent.path) > 1 and len(other.path) > 1:
                 #Regular collision
-                if agent.path[1] == other.path[1]:
+                if agent.path[1].id == other.path[1].id:
                     return agent, other
 
                 #Swap collision
-                if agent.path[0] == other.path[1] and agent.path[1] == other.path[0]:
+                if agent.path[0].id == other.path[1].id and agent.path[1].id == other.path[0].id:
                     return agent, other
 
         return None, None
@@ -71,18 +109,23 @@ class Simulation(object):
                 return a1, a2
         return None, None
 
-
     def apply_rule(self, state, rule):
         if rule == 0:
-            return self.apply_swerve_rule(self.find_correct_agent(state.agent1))
+            agent1 = self.find_correct_agent(state.agent1)
+            return self.apply_swerve_rule(agent1)
         elif rule == 1:
-            return self.apply_swerve_rule(self.find_correct_agent(state.agent2))
+            agent2 = self.find_correct_agent(state.agent2)
+            return self.apply_swerve_rule(agent2)
         elif rule == 2:
-            return self.apply_wait_rule(self.find_correct_agent(state.agent1))
+            agent1 = self.find_correct_agent(state.agent1)
+            return self.apply_wait_rule(agent1)
         elif rule == 3:
-            return self.apply_wait_rule(self.find_correct_agent(state.agent2))
+            agent2 = self.find_correct_agent(state.agent2)
+            return self.apply_wait_rule(agent2)
         elif rule == 4:
-            return self.apply_multi_swerve_rule(self.find_correct_agent(state.agent1), self.find_correct_agent(state.agent2))
+            agent1 = self.find_correct_agent(state.agent1)
+            agent2 = self.find_correct_agent(state.agent2)
+            return self.apply_multi_swerve_rule(agent1, agent2)
 
     def find_correct_agent(self,copy_agent):
         for agent in self.agents:
@@ -110,11 +153,13 @@ class Simulation(object):
                 continue
             neighbour = self.graph[x][y]
             if neighbour.type == NodeType.OBSTACLE:
+                #print("can't swevre to %d bcause OBSTACLE" % (neighbour.id))
                 continue
 
             agent.path = [agent.pos, neighbour]
             a1, a2 = self.agent_will_collide_next_step(agent)
             if a1:
+                #print("can't swevre to %d bcause will collide next" % (neighbour.id))
                 continue
 
             new_distance = manhattan_distance(neighbour, agent.pickup.get_target())
@@ -123,11 +168,11 @@ class Simulation(object):
                 min_distance = new_distance
 
         if min_neighbour:
-            #Temp
             temp_pos = agent.pos
             agent.pos = min_neighbour
             agent.path = AStar(self.graph, agent)
             agent.path.insert(0, temp_pos)
+            agent.pos = temp_pos
             return True
         return False
 
@@ -179,10 +224,12 @@ class Simulation(object):
             agent1.pos = min_neighbour1
             agent1.path = AStar(self.graph, agent1)
             agent1.path.insert(0, temp_pos1)
+            agent1.pos = temp_pos1
 
             temp_pos2 = agent2.pos
             agent2.pos = min_neighbour2
             agent2.path = AStar(self.graph, agent2)
             agent2.path.insert(0, temp_pos2)
+            agent2.pos = temp_pos2
             return True
         return False

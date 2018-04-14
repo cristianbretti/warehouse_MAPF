@@ -1,4 +1,4 @@
-from orders import small_order_list as small
+from orders import *
 from warehouse import warehouse
 from Agent import *
 from Worker import *
@@ -9,7 +9,7 @@ from WHCA import *
 from Simulation import *
 
 def main():
-	order_input = small
+	order_input = small_order_list
 	number_of_agents = 5
 
 	graph, pickup_nodes, drop_off_nodes = create_Astar_graph(warehouse)
@@ -24,7 +24,7 @@ def main():
 		assign_item_to_agent(a, workers)
 
 	WHCA(graph, agents, 20, 10, workers)
-	#sim = Simulation(graph, agents, workers)
+	#sim = Simulation(graph, agents, workers, False)
 	#state, cost, done = sim.run()
 
 	# if state:

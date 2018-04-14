@@ -2,10 +2,14 @@ from heapq import *
 from Nodes import *
 from functions import *
 
-def AStar(graph, agent):
-    reset_graph(graph)
+def AStar(graph, agent, p=False):
+    #reset_graph(graph)
     start = agent.pos
+    start.came_from = None
     target = agent.pickup.get_target()
+
+    if p:
+        print("new astar from %d to %d" % (start.id, target.id))
 
     start.g = 0
     start.h = manhattan_distance(start, target)
