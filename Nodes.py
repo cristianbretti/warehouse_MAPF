@@ -35,6 +35,7 @@ class AStarNode(BasicNode):
         return self.id
 
     def compare(self, other):
+        ok = True
         if self.id != other.id:
             print("1")
             return False
@@ -46,28 +47,33 @@ class AStarNode(BasicNode):
             return False
         if self.g != other.g:
             print("4")
-            return False
+            #return False
+            ok = False
         if self.h != other.h:
             print("5")
-            return False
+            #return False
+            ok = False
         if self.f != other.f:
             print("6")
-            return False
+            #return False
+            ok = False
         if self.came_from and other.came_from:
             if self.came_from.id != other.came_from.id:
                 print("7")
-                return False
-        elif self.came_from:
+                ok = False
+        elif self.came_from and not other.came_from:
             print("8")
-            return False
-        elif other.came_from:
+            ok = False
+        elif other.came_from and not self.came_from:
             print("9")
-            return False
+            ok = False
         if self.depth != other.depth:
             print("10")
-            return False
+            ok = False
         if self.booked != other.booked:
             print("11")
-            return False
+            ok = False
 
+        if not ok:
+            return False
         return True

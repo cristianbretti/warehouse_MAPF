@@ -83,6 +83,7 @@ class Agent(object):
         elif len(self.path) > 0:
             self.pos = self.path[0]
             self.walking_path += [self.pos]
+            #print("standing still at %d " % (self.pos.id))
 
 
     def done_with_target(self):

@@ -11,8 +11,11 @@ small_order_list = [[104,1182,357,206,453,1123]]
 
 #big_order_list = [[[104,1182,357,206,453,1123]]]
 #big_temp = [[[206,357]]] # works in under 1 sec
-big_temp = [[[357],[206],[839],[104]]]
-#big_temp = [[[839]]]
+big_temp = [[[202,204]]] # have on paper
+#big_temp = [[[839], [204, 178], [357], [106, 176]]] ## 8020
+#big_temp = [[[839],[357], [106]]] # gives 103 sol  too many
+#big_temp = [[[839],[204],[357], [106]]] # 675 solutions
+
 
 
 left_pickups = [104,106,108,110,112,

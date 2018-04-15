@@ -97,14 +97,14 @@ def reset_booked(graph, booked_items):
 	# this might work since reset book should only happen
 	# once a simulation is fully complete,
 	# and the all nodes booked should be false.
-	for (x,y) in booked_items:
-		graph[x][y].booked = True
-	# for k in range(0, graph.shape[0]):
-	# 	for l in range(0, graph.shape[1]):
-	# 		if (k,l) in booked_items:
-	# 			graph[k][l].booked = True
-	# 		else:
-	# 			graph[k][l].booked = False
+	# for (x,y) in booked_items:
+	# 	graph[x][y].booked = True
+	for k in range(0, graph.shape[0]):
+		for l in range(0, graph.shape[1]):
+			if (k,l) in booked_items:
+				graph[k][l].booked = True
+			else:
+				graph[k][l].booked = False
 
 def reset_graph(graph):
     for i in range(0, graph.shape[0]):
@@ -123,7 +123,7 @@ def reset_f_val_graph(graph):
             graph[i][j].f = None
             graph[i][j].came_from = None
 
-def extract_path(current):
+def extract_path(current, graph=None):
     path = [current]
     next_node = current.came_from
     while next_node:
@@ -132,4 +132,6 @@ def extract_path(current):
 
     for node in path:
         node.came_from = None
+    # if graph != None:
+    #     reset_graph(graph)
     return path

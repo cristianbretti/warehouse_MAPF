@@ -9,7 +9,7 @@ from WHCA import *
 from Simulation import *
 
 def main():
-	order_input = small_order_list
+	order_input = big_temp[0]
 	number_of_agents = 5
 
 	graph, pickup_nodes, drop_off_nodes = create_Astar_graph(warehouse)

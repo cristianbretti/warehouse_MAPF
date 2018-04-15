@@ -5,8 +5,8 @@ from rule_expert import *
 from Simulation import *
 import cProfile
 
-number_of_agents = 5
-big_order_list = simulate_big_order_list(uniform=False, num_simulations=1, num_orders=4, average_item_per_order=2)
+number_of_agents = 20
+big_order_list = simulate_big_order_list(uniform=False, num_simulations=1, num_orders=10, average_item_per_order=2)
 #big_order_list = big_temp
 
 def main():
@@ -27,6 +27,12 @@ def main():
 		root = RuleExpertNode(0, root_simulation)
 		init_build()
 		build_tree(root, 0, False)
+
+		print("handled_crashes:")
+		for key in get_crashes():
+			print(get_crashes()[key])
+		print("")
+		print("Rules")
 		print(rules)
 		#print(print_tree(root))
 		#sim_tree(root)
@@ -38,6 +44,8 @@ def main():
 		print("all different solutions:")
 		for key in table.keys():
 			print(key)
+
+
 		print("DONE")
 
 

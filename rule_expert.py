@@ -5,10 +5,35 @@ from Simulation import *
 
 min_so_far = 10**5
 rules = [0,0,0,0,0]
+handled_crashes = dict()
+
+def get_crashes():
+	return handled_crashes
 
 def init_build():
 	global min_so_far
 	min_so_far = 10**5
+	global handled_crashes
+	handled_crashes = dict()
+
+def hash_two(a, b):
+    return int((a+b)*(a+b+1)/2 + b)
+
+def hash_crash(state, cost):
+	a = hash_two(state.agent1.id, state.agent1.pos.id)
+	b = hash_two(state.agent2.id, state.agent2.pos.id)
+	c = 0
+	for agent in state.agents:
+		c += hash_two(agent.id, agent.pos.id)
+	d = hash_two(a, b) % 100
+	e = hash_two(d, c) % 100
+	ret = hash_two(e, cost)
+	# print("A crash between %d and %d at %d and %d with cost %d " % (state.agent1.id, state.agent2.id, state.agent1.pos.id, state.agent2.pos.id, cost))
+	# for agent in state.agents:
+	# 	print("Agent %d at %d " % (agent.id, agent.pos.id))
+	# print("GOT HASH: %f" % (ret))
+	return ret
+
 
 class RuleExpertNode(object):
 	def __init__(self, cost, simulation):
@@ -19,9 +44,10 @@ class RuleExpertNode(object):
 		self.children = [None, None, None, None, None]
 
 
-def build_tree(node, prevCost, crash_prev):
+def build_tree(node, prevCost, crash_prev, crash_prev_agents=None):
 	global min_so_far
 	done = False
+
 	node.state, node.cost, done = node.simulation.run()
 
 	if done:
@@ -29,45 +55,78 @@ def build_tree(node, prevCost, crash_prev):
 		node.leaf = True
 		if node.cost < min_so_far:
 			min_so_far = node.cost
-		return
+		return node.cost
 
 	if node.cost >= min_so_far:
 		print("already surpassed min so far")
 		node = None
-		return
+		return 10**5
 
-	# print("CRASH with cost: %d " % (node.cost))
+	# print("CRASH with cost: %d for agents %d and %d going to %d and %d" % (node.cost, node.state.agent1.id, node.state.agent2.id,node.state.agent1.pickup.get_target().id, node.state.agent2.pickup.get_target().id))
 	# print("agent 1 path")
 	# print([x.id for x in node.state.agent1.path[:3]])
 	# print("agent 2 path")
 	# print([x.id for x in node.state.agent2.path[:3]])
 	# print("")
+	# print("")
+
+	if hash_crash(node.state, node.cost) in handled_crashes:
+		node.cost = handled_crashes[hash_crash(node.state, node.cost)]
+		node.leaf = True
+		return node.cost
+		# #print("			already seen this crash")
+		# node = None
+		# return node.cost
+
 
 	if node.cost == prevCost + 1:
-		if crash_prev: # maybe more that 2 crashes in a row should be considered?
+		if crash_prev and (node.state.agent1.id, node.state.agent2.id) == crash_prev_agents:
+			print("Reached BAD end of simulation, to many crashes in a row for same agents!")
+			#draw(node.simulation.agents, node.simulation.graph)
 			node = None
-			#print("Reached BAD end of simulation")
 			return 10**5
 		else:
 			crash_prev = True
+			crash_prev_agents = (node.state.agent1.id, node.state.agent2.id)
 	else:
 		crash_prev = False
+		crash_prev_agents = None
 
+	#handled_crashes[hash_crash(node.state, node.cost)] = True
 	booked_items = get_booked_items(node.simulation.graph)
 
+	min = 10**5
 	for i in range(0, 5):
-		new_sim = copy.copy(node.simulation)
-		new_sim.agents = copy.deepcopy(node.simulation.agents)
-		new_sim.workers = copy.deepcopy(node.simulation.workers)
-		#new_sim = copy.deepcopy(node.simulation)
-		reset_booked(new_sim.graph, booked_items)
-		#reset_graph(new_sim.graph)
-		child = RuleExpertNode(node.cost, new_sim)
-		if child.simulation.apply_rule(node.state, i):
+		reset_booked(node.simulation.graph, booked_items)
+		#reset_graph(node.simulation.graph)
+		ok, new_path1, new_path2 = node.simulation.can_apply_rule(node.state, i)
+		if ok:
+			#print("rule %d worked "% (i))
 			global rules
 			rules[i] += 1
-			build_tree(child, node.cost, crash_prev)
+			new_sim = create_new_sim(node.simulation)
+
+			child = RuleExpertNode(node.cost, new_sim)
+			child.simulation.apply_rule(node.state, i, new_path1, new_path2)
+			#draw(child.simulation.agents, child.simulation.graph)
+
+			current = build_tree(child, node.cost, crash_prev, crash_prev_agents)
+			if current < min:
+				min = current
 			node.children[i] = child
+
+	handled_crashes[hash_crash(node.state, node.cost)] = min
+	return min
+
+def create_new_sim(old_sim):
+	new_sim = copy.copy(old_sim)
+	new_sim.agents = copy.deepcopy(old_sim.agents)
+	new_sim.workers = copy.deepcopy(old_sim.workers)
+	new_sim.cost = copy.deepcopy(old_sim.cost)
+	return new_sim
+
+def create_new_sim_with_graph(old_sim):
+	return copy.deepcopy(old_sim)
 
 def get_booked_items(graph):
 		booked_items = []
@@ -76,6 +135,14 @@ def get_booked_items(graph):
 				if graph[i][j].booked:
 					booked_items.append((i,j))
 		return booked_items
+
+def compare_graph(graph1, graph2):
+	for i in range(0, graph1.shape[0]):
+		for j in range(0, graph1.shape[1]):
+			if not graph1[i][j].compare(graph2[i][j]):
+				return False
+	return True
+
 
 
 def print_tree(root):
