@@ -63,7 +63,8 @@ class Simulation(object):
         return None, self.cost, done
 
     def one_iteration(self, prev_cost_reached=None, p=False, other=None):
-        print("I AM IN ONE ITERATION")
+        if p:
+            print("I AM IN ONE ITERATION")
         done = False
         for agent in self.agents:
             if p:
@@ -76,7 +77,7 @@ class Simulation(object):
                 print([x.id for x in other.path])
             self.cost += 1
             if p:
-                print("agent%d just s           tepped and now has path" % (agent.id))
+                print("agent%d just stepped and now has path" % (agent.id))
                 print([x.id for x in agent.path])
             # if prev_cost_reached:
             #     if self.cost > prev_cost_reached:
@@ -122,6 +123,8 @@ class Simulation(object):
                 self.apply_tree_rule(state)
 
         done = not one_agent_has_pickup(self.agents)
+        if p:
+            print("was NO crash")
         return None, self.cost, done
 
     def apply_tree_rule(self, state):

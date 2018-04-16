@@ -54,7 +54,7 @@ class Agent(object):
 
     def copy(self):
         new_agent = Agent(self.pos, self.id)
-        new_agent.path = copy.deepcopy(self.path)
+        new_agent.path = self.path.copy()
 
         if self.pickup:
             # new_agent.pickup = Pickup(self.pickup.target_list[0], self.pickup.target_list[1])

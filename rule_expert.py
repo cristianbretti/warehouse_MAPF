@@ -66,14 +66,13 @@ def build_tree(node, prevCost, crash_prev, crash_prev_agents=None, crash=None):
 	global min_node
 	done = False
 
-	if crash:
-		print("was crash")
-		node.state = crash.state
-		node.cost = crash.cost
-		done = crash.done
-		print(node.state.agent1)
-	else:
-		node.state, node.cost, done = node.simulation.run(min_so_far)
+	# if crash:
+	# 	print("was crash")
+	# 	node.state = crash.state
+	# 	node.cost = crash.cost
+	# 	done = crash.done
+	# else:
+	node.state, node.cost, done = node.simulation.run(min_so_far)
 
 
 	if done:
@@ -82,7 +81,7 @@ def build_tree(node, prevCost, crash_prev, crash_prev_agents=None, crash=None):
 		if node.cost < min_so_far:
 			min_so_far = node.cost
 			min_node = node
-			#gc.collect()
+			gc.collect()
 		return node.cost
 
 	if node.cost >= min_so_far:
@@ -90,13 +89,13 @@ def build_tree(node, prevCost, crash_prev, crash_prev_agents=None, crash=None):
 		node = None
 		return 10**5
 
-	print("CRASH with cost: %d for agents %d and %d going to %d and %d" % (node.cost, node.state.agent1.id, node.state.agent2.id,node.state.agent1.pickup.get_target().id, node.state.agent2.pickup.get_target().id))
-	print("agent 1 path")
-	print([x.id for x in node.state.agent1.path[:3]])
-	print("agent 2 path")
-	print([x.id for x in node.state.agent2.path[:3]])
-	print("")
-	print("")
+	# print("CRASH with cost: %d for agents %d and %d going to %d and %d" % (node.cost, node.state.agent1.id, node.state.agent2.id,node.state.agent1.pickup.get_target().id, node.state.agent2.pickup.get_target().id))
+	# print("agent 1 path")
+	# print([x.id for x in node.state.agent1.path[:3]])
+	# print("agent 2 path")
+	# print([x.id for x in node.state.agent2.path[:3]])
+	# print("")
+	# print("")
 
 	if hash_crash(node.state, node.cost) in handled_crashes:
 		node.cost = handled_crashes[hash_crash(node.state, node.cost)]
@@ -135,61 +134,81 @@ def build_tree(node, prevCost, crash_prev, crash_prev_agents=None, crash=None):
 			#print("rule %d worked "% (i))
 			global rules
 			rules[i] += 1
-			new_sim_1 = create_new_sim_1(node.simulation)
-			new_sim_2 = create_new_sim_2(node.simulation)
+			new_sim = create_new_sim_2(node.simulation)
+			#new_sim_2 = create_new_sim_2(node.simulation)
 
-			child = RuleExpertNode(node.cost, new_sim_1, node, i)
+			child = RuleExpertNode(node.cost, new_sim, node, i)
+			#child2 = RuleExpertNode(node.cost, new_sim_2, node, i)
 			copy1 = []
 			copy2 = []
 			copy3 = []
 			copy4 = []
 			if new_path1:
 				copy1 = new_path1.copy()
-				copy2 = new_path1.copy()
+				#copy3 = new_path1.copy()
 			if new_path2:
-				copy3 = new_path2.copy()
-				copy4 = new_path2.copy()
+				copy2 = new_path2.copy()
+				#copy4 = new_path2.copy()
 
 			child.simulation.apply_rule(node.state, i, copy1, copy2)
 
-			new_sim_2.apply_rule(node.state, i, copy3, copy4)
+			#child2.simulation.apply_rule(node.state, i, copy3, copy4)
 			#draw(child.simulation.agents, child.simulation.graph)
 
-			if not compare_agents(new_sim_1.agents, new_sim_2.agents):
-				print("AGNETS NOT SSAME AFTER DIRECTLY ")
+			#if not compare_agents(new_sim_1.agents, new_sim_2.agents):
+			#	print("				AGNETS NOT SSAME AFTER DIRECTLY ")
 
-			print("HERE")
-			done = False
-			count = 0
-			c = None
-			while (not done):
-				print("one step new_sim_1")
-				state1, cost1, done1 = new_sim_1.one_iteration(p=True)
-				print("one step new_sim_2")
-				state2, cost2, done2 = new_sim_2.one_iteration(p=True)
+			# done = False
+			# count = 0
+			# c = None
+			# c2 = None
+			# while (not done):
+			# 	#print("one step new_sim_1")
+			# 	state1, cost1, done1 = new_sim_1.one_iteration(p=False)
+			# 	#print("one step new_sim_2")
+			# 	#state2, cost2, done2 = new_sim_2.one_iteration(p=False)
+			#
+			#
+			#
+			# 	# if done1 != done2:
+			# 	# 	print("				Not equal done")
+			# 	# 	#return
+			# 	#
+			# 	# if cost1 != cost2:
+			# 	# 	print("			COST NOT EQUAL")
+			# 	#
+			# 	# if state1:
+			# 	# 	if state2:
+			# 	# 		if not compare_state(state1, state2):
+			# 	# 			print("			state not eq ater %d " % (count))
+			# 	# 	else:
+			# 	# 		print("satte 1 finns men inte state2")
+			# 	# elif state2:
+			# 	# 	print("satte 2 but not 1")
+			# 	#
+			# 	# if not compare_agents(new_sim_1.agents, new_sim_2.agents):
+			# 	# 	print("				AGNETS NOT SSAME AFTER %d count" % (count))
+			# 	#
+			# 	# 	return
+			#
+			# 	if done1:
+			# 		child2.leaf = True
+			# 		break
+			#
+			# 	if state2:
+			# 		c = Crash(state1, cost2, done2)
+			# 		c2 = Crash(state2, cost2, done2)
+			# 		break
+			#
+			# 	done = done2
+			# 	count += 1
 
-
-
-				if done1 != done2:
-					print("Not equal done")
-					#return
-
-				if not compare_agents(new_sim_1.agents, new_sim_2.agents):
-					print("AGNETS NOT SSAME AFTER %d count" % (count))
-					#return
-
-				if done1:
-					child.leaf = True
-					continue
-
-				done = done1
-				count += 1
-
-
-			current = build_tree(child, node.cost, crash_prev, crash_prev_agents, c)
+			current = build_tree(child, node.cost, crash_prev, crash_prev_agents)#, c)
 			if current < min:
 				min = current
 			node.children[i] = child
+		# else:
+		# 	print("rule %d did not work" % (i))
 
 	handled_crashes[hash_crash(node.state, node.cost)] = min
 	return min
@@ -228,6 +247,25 @@ def compare_graph(graph1, graph2):
 			if not graph1[i][j].compare(graph2[i][j]):
 				return False
 	return True
+
+def compare_state(state1, state2):
+	ok = True
+	if state1.agent1.id != state2.agent1.id:
+		print("agent1 not eq")
+		ok = False
+	if state1.agent2.id != state2.agent2.id:
+		print("agent2 not eq")
+		ok = False
+	if state1.agent1.pos.id != state2.agent1.pos.id:
+		print("agent1 pos not eq")
+		ok = False
+	if state1.agent2.pos.id != state2.agent2.pos.id:
+		print("agent2 pos not eq")
+		ok = False
+	if not compare_agents(state1.agents, state2.agents):
+		print("state agents not equal")
+		ok = False
+	return ok
 
 
 

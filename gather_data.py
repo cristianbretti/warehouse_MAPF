@@ -63,8 +63,8 @@ def main():
 		build_tree(root, 0, False)
 
 
-		# print("Rules")
-		# print(rules)
+		print("Rules")
+		print(rules)
 		# #print(print_tree(root))
 		# #sim_tree(root)
 		# print("one done:")
@@ -79,5 +79,5 @@ def main():
 	file.close()
 
 if __name__ == "__main__":
-	#cProfile.run('main()')
-	main()
+	cProfile.run('main()')
+	#main()

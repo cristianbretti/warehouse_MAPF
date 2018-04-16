@@ -1,6 +1,7 @@
 from heapq import *
 from Nodes import *
 from functions import *
+import copy
 
 def AStar(graph, agent, p=False):
     #reset_graph(graph)
@@ -83,14 +84,18 @@ def AStarReserved(graph, agent, reservation_table, p=False):
 
     while open_list:
         current = heappop(open_list)
-        closed_list.add(current)
+        closed_list.add((current.id, current.depth))
 
         if p:
-            print("now looking at %d ")
+            print("now looking at %d depth: %d" % (current.id, current.depth))
 
         if current.coordinates == target.coordinates:
             # target is found, extract the path
-            return extract_path(current, graph)
+            path = extract_path(current, graph)
+            if p:
+                print("found path is")
+                print([x.id for x in path])
+            return path
 
         for (i,j) in neighbours:
             x, y = (current.coordinates[0] + i, current.coordinates[1] + j)
@@ -98,17 +103,20 @@ def AStarReserved(graph, agent, reservation_table, p=False):
                 # neighbour coordinates are out of the graph
                 continue
             neighbour = graph[x][y]
+            #if not current.depth > 7:
+            neighbour = copy.deepcopy(neighbour)
             neighbour.depth = current.depth + 1
             if neighbour.type == NodeType.OBSTACLE and agent.is_carrying_shelf:
                 continue
-            if neighbour in closed_list:
+
+            if (neighbour.id, current.depth + 1) in closed_list:
                 if p:
-                    print("skipped neighbour %d becuase in CLOSED" % (neighbour.id))
+                    print("skipped neighbour %d depth: %d becuase in CLOSED" % (neighbour.id, neighbour.depth))
                 continue
 
             if collisionWillOccur(reservation_table, current, neighbour):
                 if p:
-                    print("skipped neighbour %d becuase of collision" % (neighbour.id))
+                    print("skipped neighbour %d depth %d becuase of collision" % (neighbour.id, neighbour.depth))
                 continue
 
             if neighbour not in open_list or current.g + 1 < neighbour.g:
@@ -117,5 +125,7 @@ def AStarReserved(graph, agent, reservation_table, p=False):
                 neighbour.f = neighbour.g + neighbour.h
                 neighbour.came_from = current
                 if neighbour not in open_list:
+                    if p:
+                        print("added %d depth %d to open list" % (neighbour.id, neighbour.depth))
                     heappush(open_list, neighbour)
     return []
