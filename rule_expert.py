@@ -4,15 +4,21 @@ from Simulation import *
 
 
 min_so_far = 10**5
+min_node = None
 rules = [0,0,0,0,0]
 handled_crashes = dict()
 
 def get_crashes():
 	return handled_crashes
 
+def get_min_node():
+	return min_node
+
 def init_build():
 	global min_so_far
 	min_so_far = 10**5
+	global min_node
+	min_node = None
 	global handled_crashes
 	handled_crashes = dict()
 
@@ -36,16 +42,19 @@ def hash_crash(state, cost):
 
 
 class RuleExpertNode(object):
-	def __init__(self, cost, simulation):
+	def __init__(self, cost, simulation, parent=None, from_rule=None):
 		self.cost = cost
 		self.simulation = simulation
 		self.state = None
 		self.leaf = False
+		self.parent = parent
+		self.from_rule = from_rule
 		self.children = [None, None, None, None, None]
 
 
 def build_tree(node, prevCost, crash_prev, crash_prev_agents=None):
 	global min_so_far
+	global min_node
 	done = False
 
 	node.state, node.cost, done = node.simulation.run()
@@ -55,6 +64,7 @@ def build_tree(node, prevCost, crash_prev, crash_prev_agents=None):
 		node.leaf = True
 		if node.cost < min_so_far:
 			min_so_far = node.cost
+			min_node = node
 		return node.cost
 
 	if node.cost >= min_so_far:
@@ -106,7 +116,7 @@ def build_tree(node, prevCost, crash_prev, crash_prev_agents=None):
 			rules[i] += 1
 			new_sim = create_new_sim(node.simulation)
 
-			child = RuleExpertNode(node.cost, new_sim)
+			child = RuleExpertNode(node.cost, new_sim, node, i)
 			child.simulation.apply_rule(node.state, i, new_path1, new_path2)
 			#draw(child.simulation.agents, child.simulation.graph)
 

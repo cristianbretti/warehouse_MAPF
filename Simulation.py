@@ -23,12 +23,11 @@ class Simulation(object):
     def run(self):
         done = False
         while(not done):
-            self.cost += 1
             for agent in self.agents:
                 if not agent.pickup:
                     continue
                 agent.one_step_in_path()
-
+                self.cost += 1
                 if agent.done_with_target():
                     if not agent.pickup.advance_pickup_state(self.workers, agent.is_copy):
                         x,y = agent.pickup.target_list[0].coordinates
@@ -106,7 +105,7 @@ class Simulation(object):
                 continue
             if len(agent.path) > 1 and len(other.path) > 1:
                 #Regular collision
-                if agent.path[1].id == other.path[1].id:
+                if agent.path[1].id == other.path[1].id and agent.path[1].type != NodeType.DROPOFF:
                     return agent, other
 
                 #Swap collision
@@ -114,34 +113,7 @@ class Simulation(object):
                     return agent, other
 
         return None, None
-
-    #check if the two agents will collide with eachother or any other agent
-    def multi_agent_will_collide_next_step(self, agent1, agent2):
-        if len(agent1.path) > 1 and len(agent2.path) > 1:
-            if agent1.path[1].id == agent2.path[1].id:
-                return True
-            if agent2.path[0].id == agent1.path[1].id and agent2.path[1].id == agent1.path[0].id:
-                return True
-
-        for j in range(0, len(self.agents)):
-            other = self.agents[j]
-            if agent1.id == other.id or agent2.id == other.id:
-                continue
-
-            if len(agent1.path) > 1 and len(other.path) > 1 and len(agent2.path) > 1:
-                #Regular collision
-                if agent1.path[1].id == other.path[1].id:
-                    return True
-                if agent2.path[1].id == other.path[1].id:
-                    return True
-
-                #Swap collision
-                if agent1.path[0].id == other.path[1].id and agent1.path[1].id == other.path[0].id:
-                    return True
-                if agent2.path[0].id == other.path[1].id and agent2.path[1].id == other.path[0].id:
-                    return True
-
-        return False
+    
 
     def agents_will_collide_next_step(self):
         for i in range(0, len(self.agents)):
@@ -150,27 +122,6 @@ class Simulation(object):
             if a1:
                 return a1, a2
         return None, None
-
-
-
-    # def apply_rule_old(self, state, rule):
-    #     if rule == 0:
-    #         agent1 = self.find_correct_agent(state.agent1)
-    #         return self.apply_swerve_rule(agent1)[0]
-    #     elif rule == 1:
-    #         agent2 = self.find_correct_agent(state.agent2)
-    #         return self.apply_swerve_rule(agent2)[0]
-    #     elif rule == 2:
-    #         agent1 = self.find_correct_agent(state.agent1)
-    #         return self.apply_wait_rule(agent1)[0]
-    #     elif rule == 3:
-    #         agent2 = self.find_correct_agent(state.agent2)
-    #         return self.apply_wait_rule(agent2)[0]
-    #     elif rule == 4:
-    #         agent1 = self.find_correct_agent(state.agent1)
-    #         agent2 = self.find_correct_agent(state.agent2)
-    #         ok = self.apply_multi_swerve_rule(agent1, agent2, old=True)[0]
-    #         return ok
 
     def can_apply_rule(self, state, rule):
         agent1_old_path = state.agent1.path.copy()
