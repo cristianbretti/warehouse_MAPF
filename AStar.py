@@ -119,6 +119,13 @@ def AStarReserved(graph, agent, reservation_table, p=False):
                     print("skipped neighbour %d depth %d becuase of collision" % (neighbour.id, neighbour.depth))
                 continue
 
+            if neighbour in open_list:
+                # make neighbour refer to correct node object
+                for x in open_list:
+                    if x == neighbour:
+                        neighbour = x
+                        break
+
             if neighbour not in open_list or current.g + 1 < neighbour.g:
                 neighbour.g = current.g + 1
                 neighbour.h = manhattan_distance(neighbour, target)

@@ -5,7 +5,7 @@ from rule_expert import *
 from Simulation import *
 import cProfile
 
-number_of_agents = 5
+number_of_agents = 10
 file_name = "data_for_" + str(number_of_agents) + "_agents.txt"
 #big_order_list = simulate_big_order_list(uniform=False, num_simulations=1, num_orders=8, average_item_per_order=2)
 big_order_list = big_temp
@@ -43,8 +43,10 @@ def write_line_to_file(x, file):
 
 
 def main():
-	file = open(file_name, "a")
-	for order_input in big_order_list:
+	while True:
+		
+		order_input = simulate_8020_orders(random.randint(2,15), random.randint(1,4))
+	#for order_input in big_order_list:
 		print(order_input)
 		graph, pickup_nodes, drop_off_nodes = create_Astar_graph(warehouse)
 
@@ -63,21 +65,21 @@ def main():
 		build_tree(root, 0, False)
 
 
-		print("Rules")
-		print(rules)
+		#print("Rules")
+		#print(rules)
 		# #print(print_tree(root))
 		# #sim_tree(root)
 		# print("one done:")
-		print("number of solutions: %d" % (number_solutions(root)))
-		print("cheapest solution: %d" % (cheapest_solution(root)))
-		print("min node_cost: %d " % (get_min_node().cost))
+		#print("cheapest solution: %d" % (cheapest_solution(root)))
+		#print("min node_cost: %d " % (get_min_node().cost))
 		#
+		file = open(file_name, "a")
 		number_of_datas = extract_data(get_min_node(), file)
-		print("%d number of datas added" % (number_of_datas))
+		#print("%d number of datas added" % (number_of_datas))
 		print("One simulation DONE")
-
-	file.close()
+		file.flush()
+		file.close()
 
 if __name__ == "__main__":
-	cProfile.run('main()')
-	#main()
+	#cProfile.run('main()')
+	main()

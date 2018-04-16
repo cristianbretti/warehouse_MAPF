@@ -53,7 +53,7 @@ class RuleExpertNode(object):
 		self.leaf = False
 		self.parent = parent
 		self.from_rule = from_rule
-		self.children = [None, None, None, None, None]
+		#self.children = [None, None, None, None, None]
 
 class Crash(object):
 	def __init__(self, state, cost, done):
@@ -76,7 +76,7 @@ def build_tree(node, prevCost, crash_prev, crash_prev_agents=None, crash=None):
 
 
 	if done:
-		print("Reached GOOD end of simulation")
+		#print("Reached GOOD end of simulation")
 		node.leaf = True
 		if node.cost < min_so_far:
 			min_so_far = node.cost
@@ -206,7 +206,7 @@ def build_tree(node, prevCost, crash_prev, crash_prev_agents=None, crash=None):
 			current = build_tree(child, node.cost, crash_prev, crash_prev_agents)#, c)
 			if current < min:
 				min = current
-			node.children[i] = child
+			#node.children[i] = child
 		# else:
 		# 	print("rule %d did not work" % (i))
 
