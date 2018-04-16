@@ -7,7 +7,7 @@ import cProfile
 
 number_of_agents = 5
 file_name = "data_for_" + str(number_of_agents) + "_agents.txt"
-big_order_list = simulate_big_order_list(uniform=False, num_simulations=1, num_orders=8, average_item_per_order=2)
+big_order_list = simulate_big_order_list(uniform=False, num_simulations=2, num_orders=8, average_item_per_order=2)
 #big_order_list = big_temp
 
 def get_x_vector_from_state(state):
@@ -30,7 +30,7 @@ def extract_data(node, file):
 		write_line_to_file(x, file)
 		node = parent
 		parent = node.parent
-	
+
 
 
 def write_line_to_file(x, file):
@@ -60,19 +60,20 @@ def main():
 		init_build()
 		build_tree(root, 0, False)
 
-		
-		print("Rules")
-		print(rules)
-		print(print_tree(root))
-		#sim_tree(root)
-		print("one done:")
-		print("number of solutions: %d" % (number_solutions(root)))
-		print("cheapest solution: %d" % (cheapest_solution(root)))
-		
+
+		# print("Rules")
+		# print(rules)
+		# #print(print_tree(root))
+		# #sim_tree(root)
+		# print("one done:")
+		# print("number of solutions: %d" % (number_solutions(root)))
+		# print("cheapest solution: %d" % (cheapest_solution(root)))
+
 		extract_data(get_min_node(), file)
-		print("DONE")
+		print("One simulation DONE")
+		
 	file.close()
 
 if __name__ == "__main__":
-	#cProfile.run('main()')
-	main()
+	cProfile.run('main()')
+	#main()

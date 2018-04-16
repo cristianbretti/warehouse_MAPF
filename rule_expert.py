@@ -62,7 +62,7 @@ def build_tree(node, prevCost, crash_prev, crash_prev_agents=None):
 	node.state, node.cost, done = node.simulation.run()
 
 	if done:
-		#print("Reached GOOD end of simulation")
+		print("Reached GOOD end of simulation")
 		node.leaf = True
 		if node.cost < min_so_far:
 			min_so_far = node.cost

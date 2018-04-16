@@ -27,7 +27,8 @@ def main():
 
 	#WHCA(graph, agents, 20, 10, workers)
 	dec_tree = DecisionTree(file_name)
-	#sim = Simulation(graph, agents, workers, False)
+	sim = Simulation(graph, agents, workers, dec_tree)
+	sim.run()
 	#state, cost, done = sim.run()
 
 	# if state:

@@ -1,6 +1,7 @@
 from AStar import *
 from functions import *
 import copy
+import random
 
 class State(object):
     def __init__(self, agent1, agent2, agents):
@@ -14,7 +15,7 @@ class Simulation(object):
         self.agents = agents
         self.workers = workers
         self.cost = 0
-        self.dec_tree = None    
+        self.dec_tree = dec_tree
         for agent in self.agents:
             if agent.pickup:
                 agent.path = AStar(self.graph, agent)
@@ -50,6 +51,7 @@ class Simulation(object):
                 if not self.dec_tree:
                     return state, self.cost, done
                 else:
+                    print("applying rule")
                     self.apply_tree_rule(state)
 
             done = not one_agent_has_pickup(self.agents)
@@ -69,7 +71,7 @@ class Simulation(object):
             random.shuffle(rules)
             for j in range(0, 5):
                 i = rules[j]
-                ok, new_path1, new_path2 = node.simulation.can_apply_rule(state, i)
+                ok, new_path1, new_path2 = self.can_apply_rule(state, i)
                 if ok:
                     self.apply_rule(state, i, new_path1, new_path2)
                     return
@@ -135,7 +137,7 @@ class Simulation(object):
                     return agent, other
 
         return None, None
-    
+
 
     def agents_will_collide_next_step(self):
         for i in range(0, len(self.agents)):

@@ -1,4 +1,15 @@
 from sklearn import tree
+import numpy as np
+
+def get_x_vector_from_state(state):
+	x_vector = []
+	x_vector.append(state.agent1.pos.id)
+	x_vector.append(state.agent1.pickup.get_target().id)
+	x_vector.append(state.agent2.pos.id)
+	x_vector.append(state.agent2.pickup.get_target().id)
+	for agent in state.agents:
+		x_vector.append(agent.pos.id)
+	return x_vector
 
 class DecisionTree(object):
 	def __init__(self, file_name):
@@ -20,7 +31,7 @@ class DecisionTree(object):
 
 		number_of_inputs = len(x)
 		train_index = int(number_of_inputs*0.8)
-		
+
 		train_x = x[:train_index]
 		train_y = y[:train_index]
 
@@ -28,11 +39,10 @@ class DecisionTree(object):
 		test_y = y[train_index:]
 		self.tree.fit(train_x, train_y)
 
-		predicted_test_y = self.tree.predict(test_x)
+		print("Tree score is: %.3f" % (self.tree.score(x, y)))
 
-		number_of_errors = 0
-		for i in range(0, len(test_y)):
-			if test_y[i] != predicted_test_y[i]:
-				number_of_errors += 1
-
-		print("Tree error rate is: %.3f" %(number_of_errors/len(test_y)))
+	def get_rule(self, state):
+		x = get_x_vector_from_state(state)
+		prediction = int(self.tree.predict([x])[0])
+		print("The tree predicted rule: %d" % (prediction))
+		return prediction
