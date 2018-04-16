@@ -1,6 +1,8 @@
 import copy
 from draw_simulation import draw
 from Simulation import *
+import random
+random.seed(9611122319)
 
 
 min_so_far = 10**5
@@ -106,7 +108,10 @@ def build_tree(node, prevCost, crash_prev, crash_prev_agents=None):
 	booked_items = get_booked_items(node.simulation.graph)
 
 	min = 10**5
-	for i in range(0, 5):
+	rule_list = [0,1,2,3,4]
+	random.shuffle(rule_list)
+	for j in range(0, 5):
+		i = rule_list[j]
 		reset_booked(node.simulation.graph, booked_items)
 		#reset_graph(node.simulation.graph)
 		ok, new_path1, new_path2 = node.simulation.can_apply_rule(node.state, i)
