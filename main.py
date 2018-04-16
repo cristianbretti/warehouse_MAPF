@@ -7,10 +7,12 @@ from functions import *
 
 from WHCA import *
 from Simulation import *
+from DecisionTree import *
 
 def main():
 	order_input = big_temp[0]
 	number_of_agents = 5
+	file_name = "data_for_" + str(number_of_agents) + "_agents.txt"
 
 	graph, pickup_nodes, drop_off_nodes = create_Astar_graph(warehouse)
 
@@ -23,7 +25,8 @@ def main():
 	for a in agents:
 		assign_item_to_agent(a, workers)
 
-	WHCA(graph, agents, 20, 10, workers)
+	#WHCA(graph, agents, 20, 10, workers)
+	dec_tree = DecisionTree(file_name)
 	#sim = Simulation(graph, agents, workers, False)
 	#state, cost, done = sim.run()
 

@@ -9,16 +9,16 @@ class State(object):
         self.agents = agents
 
 class Simulation(object):
-    def __init__(self, graph, agents, workers, copy):
+    def __init__(self, graph, agents, workers, dec_tree=None):
         self.graph = graph
         self.agents = agents
         self.workers = workers
         self.cost = 0
-        if not copy:
-            for agent in self.agents:
-                if agent.pickup:
-                    agent.path = AStar(self.graph, agent)
-                    agent.walking_path = [agent.pos]
+        self.dec_tree = None    
+        for agent in self.agents:
+            if agent.pickup:
+                agent.path = AStar(self.graph, agent)
+                agent.walking_path = [agent.pos]
 
     def run(self):
         done = False
@@ -46,11 +46,33 @@ class Simulation(object):
 
             agent1, agent2 = self.agents_will_collide_next_step()
             if agent1:
-                return State(agent1, agent2, self.agents), self.cost, done
+                state = State(agent1, agent2, self.agents)
+                if not self.dec_tree:
+                    return state, self.cost, done
+                else:
+                    self.apply_tree_rule(state)
 
             done = not one_agent_has_pickup(self.agents)
 
         return None, self.cost, done
+
+    def apply_tree_rule(self, state):
+        rule = self.dec_tree.get_rule(state)
+        ok, new_path1, new_path2 = self.can_apply_rule(state, rule)
+        if ok:
+            self.apply_rule(state, rule, new_path1, new_path2)
+            return
+        else:
+            #Ruled didn't work, randomly choose one that works
+            print("FAILED TO APPLY DEC TREE RULE")
+            rules = [0,1,2,3,4]
+            random.shuffle(rules)
+            for j in range(0, 5):
+                i = rules[j]
+                ok, new_path1, new_path2 = node.simulation.can_apply_rule(state, i)
+                if ok:
+                    self.apply_rule(state, i, new_path1, new_path2)
+                    return
 
     def one_iteration(self, p=False):
         done = False
