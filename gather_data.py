@@ -6,33 +6,40 @@ from Simulation import *
 import cProfile
 
 number_of_agents = 5
+file_name = "data_for_" + str(number_of_agents) + "_agents.txt"
 #big_order_list = simulate_big_order_list(uniform=False, num_simulations=1, num_orders=10, average_item_per_order=2)
 big_order_list = big_temp
 
 def get_x_vector_from_state(state):
 	x_vector = []
 	x_vector.append(state.agent1.pos.id)
+	x_vector.append(state.agent1.pickup.get_target().id)
 	x_vector.append(state.agent2.pos.id)
+	x_vector.append(state.agent2.pickup.get_target().id)
 	for agent in state.agents:
 		x_vector.append(agent.pos.id)
 	return x_vector
 
 
-def extract_data(node):
+def extract_data(node, file):
 	if not node.parent:
 		return
 	parent = node.parent
 	y = node.from_rule
 	x = get_x_vector_from_state(parent.state)
-	print("X is:")
-	print(x)
-	print("Y is:")
-	print(y)
+	x.append(y)
+	write_line_to_file(x, file)
+	extract_data(parent, file)
 
-	extract_data(parent)
+
+def write_line_to_file(x, file):
+	for element in x:
+		file.write(str(element) + " ")
+	file.write("\n")
 
 
 def main():
+	file = open(file_name, "w")
 	for order_input in big_order_list:
 		print(order_input)
 		graph, pickup_nodes, drop_off_nodes = create_Astar_graph(warehouse)
@@ -55,20 +62,14 @@ def main():
 		print("Rules")
 		print(rules)
 		#print(print_tree(root))
-		sim_tree(root)
+		#sim_tree(root)
 		print("one done:")
 		print("number of solutions: %d" % (number_solutions(root)))
 		print("cheapest solution: %d" % (cheapest_solution(root)))
-		table = dict()
-		number_diff_solutions(root, table)
-		print("all different solutions:")
-		for key in table.keys():
-			print(key)
-
-		print("GETRAGKLRAGMKRAE")
-		print(get_min_node())
-		extract_data(get_min_node())
+		
+		extract_data(get_min_node(), file)
 		print("DONE")
+	file.close()
 
 
 if __name__ == "__main__":
