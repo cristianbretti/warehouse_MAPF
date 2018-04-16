@@ -7,8 +7,8 @@ import cProfile
 
 number_of_agents = 5
 file_name = "data_for_" + str(number_of_agents) + "_agents.txt"
-big_order_list = simulate_big_order_list(uniform=False, num_simulations=2, num_orders=8, average_item_per_order=2)
-#big_order_list = big_temp
+#big_order_list = simulate_big_order_list(uniform=False, num_simulations=1, num_orders=8, average_item_per_order=2)
+big_order_list = big_temp
 
 def get_x_vector_from_state(state):
 	x_vector = []
@@ -23,25 +23,27 @@ def get_x_vector_from_state(state):
 
 def extract_data(node, file):
 	parent = node.parent
+	number_of_datas = 0
 	while parent:
 		y = node.from_rule
 		x = get_x_vector_from_state(parent.state)
 		x.append(y)
 		write_line_to_file(x, file)
+		number_of_datas += 1
 		node = parent
 		parent = node.parent
+	return number_of_datas
 
 
 
 def write_line_to_file(x, file):
-	print("FILE")
 	for element in x:
 		file.write(str(element) + " ")
 	file.write("\n")
 
 
 def main():
-	file = open(file_name, "w")
+	file = open(file_name, "a")
 	for order_input in big_order_list:
 		print(order_input)
 		graph, pickup_nodes, drop_off_nodes = create_Astar_graph(warehouse)
@@ -66,14 +68,16 @@ def main():
 		# #print(print_tree(root))
 		# #sim_tree(root)
 		# print("one done:")
-		# print("number of solutions: %d" % (number_solutions(root)))
-		# print("cheapest solution: %d" % (cheapest_solution(root)))
-
-		extract_data(get_min_node(), file)
+		print("number of solutions: %d" % (number_solutions(root)))
+		print("cheapest solution: %d" % (cheapest_solution(root)))
+		print("min node_cost: %d " % (get_min_node().cost))
+		#
+		number_of_datas = extract_data(get_min_node(), file)
+		print("%d number of datas added" % (number_of_datas))
 		print("One simulation DONE")
-		
+
 	file.close()
 
 if __name__ == "__main__":
-	cProfile.run('main()')
-	#main()
+	#cProfile.run('main()')
+	main()

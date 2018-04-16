@@ -1,3 +1,6 @@
+import copy
+
+
 class Pickup(object):
     def __init__(self, item, worker):
         self.target_list = [item, worker, item]
@@ -49,6 +52,23 @@ class Agent(object):
         self.is_carrying_shelf = False
         self.was_at_target = False
 
+    def copy(self):
+        new_agent = Agent(self.pos, self.id)
+        new_agent.path = copy.deepcopy(self.path)
+
+        if self.pickup:
+            # new_agent.pickup = Pickup(self.pickup.target_list[0], self.pickup.target_list[1])
+            # new_agent.pickup.state = self.pickup.state
+            new_agent.pickup = copy.deepcopy(self.pickup)
+
+        new_agent.walking_path = self.walking_path.copy()
+        new_agent.target_path = self.target_path.copy()
+        new_agent.is_copy = self.is_copy
+        new_agent.is_carrying_shelf = self.is_carrying_shelf
+        new_agent.was_at_target = self.was_at_target
+
+        return new_agent
+
     def move_on_path(self, steps, pickup):
         "This method is used in WHCA"
 
@@ -73,12 +93,20 @@ class Agent(object):
         self.pos.came_from = None
         self.pos.depth = 0
 
-    def one_step_in_path(self):
+    def one_step_in_path(self, other=None):
         "This method is used in DKBR"
+
+        if other:
+            print("other in one step BEFORE POP is:")
+            print([c.id for c in other.path])
 
         if len(self.path) > 1:
             self.path.pop(0)
+            if other:
+                print("other in one step is:")
+                print([c.id for c in other.path])
             self.pos = self.path[0]
+            #print("new pos is %d "% (self.pos.id))
             self.walking_path += [self.pos]
         elif len(self.path) > 0:
             self.pos = self.path[0]

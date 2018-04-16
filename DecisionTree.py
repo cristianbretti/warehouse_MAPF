@@ -39,7 +39,7 @@ class DecisionTree(object):
 		test_y = y[train_index:]
 		self.tree.fit(train_x, train_y)
 
-		print("Tree score is: %.3f" % (self.tree.score(x, y)))
+		print("Tree score is: %.3f" % (self.tree.score(test_x, test_y)))
 
 	def get_rule(self, state):
 		x = get_x_vector_from_state(state)

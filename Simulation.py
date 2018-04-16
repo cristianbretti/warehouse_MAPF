@@ -2,6 +2,7 @@ from AStar import *
 from functions import *
 import copy
 import random
+random.seed(9611122319)
 
 class State(object):
     def __init__(self, agent1, agent2, agents):
@@ -21,7 +22,7 @@ class Simulation(object):
                 agent.path = AStar(self.graph, agent)
                 agent.walking_path = [agent.pos]
 
-    def run(self):
+    def run(self, prev_cost_reached=None):
         done = False
         while(not done):
             for agent in self.agents:
@@ -29,6 +30,9 @@ class Simulation(object):
                     continue
                 agent.one_step_in_path()
                 self.cost += 1
+                # if prev_cost_reached:
+                #     if self.cost > prev_cost_reached:
+                #         return None, 10**5, done
                 if agent.done_with_target():
                     if not agent.pickup.advance_pickup_state(self.workers, agent.is_copy):
                         x,y = agent.pickup.target_list[0].coordinates
@@ -58,6 +62,68 @@ class Simulation(object):
 
         return None, self.cost, done
 
+    def one_iteration(self, prev_cost_reached=None, p=False, other=None):
+        print("I AM IN ONE ITERATION")
+        done = False
+        for agent in self.agents:
+            if p:
+                print("considering agent %d" % (agent.id))
+            if not agent.pickup:
+                continue
+            agent.one_step_in_path(other)
+            if other:
+                print("other agent path")
+                print([x.id for x in other.path])
+            self.cost += 1
+            if p:
+                print("agent%d just s           tepped and now has path" % (agent.id))
+                print([x.id for x in agent.path])
+            # if prev_cost_reached:
+            #     if self.cost > prev_cost_reached:
+            #         return None, 10**5, done
+            if agent.done_with_target():
+                if p:
+                    print("agent%d was done with target" % (agent.id))
+                if not agent.pickup.advance_pickup_state(self.workers, agent.is_copy):
+                    if p:
+                        print("not advance state")
+                    x,y = agent.pickup.target_list[0].coordinates
+                    self.graph[x][y].booked = False
+                    #Delivered back shelf
+                    if p:
+                        print("agent%d delivered back a SHELF" % (agent.id))
+                    if not assign_item_to_agent(agent, self.workers):
+                        agent.pickup = None
+                        agent.is_carrying_shelf = False
+                if agent.pickup:
+                    x,y = agent.pickup.target_list[0].coordinates
+                    self.graph[x][y].booked = True
+                    if p:
+                        print("agent%d STILL HAS A PICKUP" % (agent.id))
+                    agent.is_carrying_shelf = agent.pickup.is_carrying_shelf()
+                    if p:
+                        print("agent %d is_carrying_shelf: %d" % (agent.id, agent.is_carrying_shelf))
+                    agent.path = AStar(self.graph, agent)
+                    if p:
+                        print("agent new path is:")
+                        print([h.id for h in agent.path])
+                else:
+                    agent.path = []
+            else:
+                if p:
+                    print("not done with target")
+        agent1, agent2 = self.agents_will_collide_next_step()
+        if agent1:
+            state = State(agent1, agent2, self.agents)
+            if not self.dec_tree:
+                return state, self.cost, done
+            else:
+                print("applying rule")
+                self.apply_tree_rule(state)
+
+        done = not one_agent_has_pickup(self.agents)
+        return None, self.cost, done
+
     def apply_tree_rule(self, state):
         rule = self.dec_tree.get_rule(state)
         ok, new_path1, new_path2 = self.can_apply_rule(state, rule)
@@ -76,51 +142,51 @@ class Simulation(object):
                     self.apply_rule(state, i, new_path1, new_path2)
                     return
 
-    def one_iteration(self, p=False):
-        done = False
-        self.cost += 1
-        for agent in self.agents:
-            if not agent.pickup:
-                continue
-            agent.one_step_in_path()
-            if p:
-                print("agent%d just stepped and now has path" % (agent.id))
-                print([x.id for x in agent.path])
-
-            if agent.done_with_target():
-                if p:
-                    print("agent%d was done with target" % (agent.id))
-                if not agent.pickup.advance_pickup_state(self.workers, agent.is_copy):
-                    x,y = agent.pickup.target_list[0].coordinates
-                    self.graph[x][y].booked = False
-                    #Delivered back shelf
-                    if p:
-                        print("agent%d delivered back a SHELF" % (agent.id))
-                    if not assign_item_to_agent(agent, self.workers):
-                        agent.pickup = None
-                        agent.is_carrying_shelf = False
-                if agent.pickup:
-                    x,y = agent.pickup.target_list[0].coordinates
-                    self.graph[x][y].booked = True
-                    if p:
-                        print("agent%d STILL HAS A PICKUP" % (agent.id))
-                    agent.is_carrying_shelf = agent.pickup.is_carrying_shelf()
-                    if p:
-                        print("agent %d is_carrying_shelf: %d" % (agent.id, agent.is_carrying_shelf))
-                    agent.path = AStar(self.graph, agent, p)
-                    if p:
-                        print("agent %d new path is:" % (agent.id))
-                        print([x.id for x in agent.path])
-                else:
-                    agent.path = []
-
-        agent1, agent2 = self.agents_will_collide_next_step()
-        if agent1:
-            return State(agent1, agent2, self.agents), self.cost, done
-
-        done = not one_agent_has_pickup(self.agents)
-
-        return None, self.cost, done
+    # def one_iteration(self, p=False):
+    #     done = False
+    #     self.cost += 1
+    #     for agent in self.agents:
+    #         if not agent.pickup:
+    #             continue
+    #         agent.one_step_in_path()
+    #         if p:
+    #             print("agent%d just stepped and now has path" % (agent.id))
+    #             print([x.id for x in agent.path])
+    #
+    #         if agent.done_with_target():
+    #             if p:
+    #                 print("agent%d was done with target" % (agent.id))
+    #             if not agent.pickup.advance_pickup_state(self.workers, agent.is_copy):
+    #                 x,y = agent.pickup.target_list[0].coordinates
+    #                 self.graph[x][y].booked = False
+    #                 #Delivered back shelf
+    #                 if p:
+    #                     print("agent%d delivered back a SHELF" % (agent.id))
+    #                 if not assign_item_to_agent(agent, self.workers):
+    #                     agent.pickup = None
+    #                     agent.is_carrying_shelf = False
+    #             if agent.pickup:
+    #                 x,y = agent.pickup.target_list[0].coordinates
+    #                 self.graph[x][y].booked = True
+    #                 if p:
+    #                     print("agent%d STILL HAS A PICKUP" % (agent.id))
+    #                 agent.is_carrying_shelf = agent.pickup.is_carrying_shelf()
+    #                 if p:
+    #                     print("agent %d is_carrying_shelf: %d" % (agent.id, agent.is_carrying_shelf))
+    #                 agent.path = AStar(self.graph, agent, p)
+    #                 if p:
+    #                     print("agent %d new path is:" % (agent.id))
+    #                     print([x.id for x in agent.path])
+    #             else:
+    #                 agent.path = []
+    #
+    #     agent1, agent2 = self.agents_will_collide_next_step()
+    #     if agent1:
+    #         return State(agent1, agent2, self.agents), self.cost, done
+    #
+    #     done = not one_agent_has_pickup(self.agents)
+    #
+    #     return None, self.cost, done
 
     def agent_will_collide_next_step(self, agent):
         for j in range(0, len(self.agents)):
