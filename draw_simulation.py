@@ -36,9 +36,9 @@ def draw_warehouse(g):
         text_id = small_id_font.render(id_text, False, (0, 0, 0))
         screen.blit(text_id, (xCord + text_offset, yCord + text_offset))
 
-def print_number_of_steps(i):
+def print_number(i, pos):
     textsurface = myfont.render(str(i), False, (255, 255, 255))
-    screen.blit(textsurface, (0,900))
+    screen.blit(textsurface, pos)
 
 def print_fps(fps):
     textsurface = myfont.render(str(fps), False, (255, 255, 255))
@@ -47,15 +47,22 @@ def print_fps(fps):
 def draw(agent_list, g):
     simulating = True
     i = 0
+    cost = 0
     fps = 10
     while simulating:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             i -= 1
+            for a in agent_list:
+                if i < len(a.walking_path):
+                    cost -= 1
             if i < 0:
                 i = 0
         if keys[pygame.K_RIGHT]:
             i += 1
+            for a in agent_list:
+                if i < len(a.walking_path):
+                    cost += 1
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -70,15 +77,14 @@ def draw(agent_list, g):
                     fps += 5
         clear_screen()
         draw_warehouse(g)
-        print_number_of_steps(i)
-        print_fps(fps)
+        
         #Draw the new position of the agents
         for a in agent_list:
             if i < len(a.walking_path):
                 agent_coordinates = (width * a.walking_path[i].coordinates[1], height * a.walking_path[i].coordinates[0])
                 #agent_target_id = a.target_path[i]
                 #agent_target_coordinates = (width * a.goal.coordinates[1], height * a.goal.coordinates[0])
-
+                
 
                 #pygame.draw.rect(screen, (255, 127, 80), pygame.Rect(agent_target_coordinates[0], agent_target_coordinates[1], width-gap, height-gap))
                 #text_goal = id_font.render(str(a.id) + " goal", False, (255, 255, 255))
@@ -90,5 +96,8 @@ def draw(agent_list, g):
                 #text_target_id = id_font.render("Agent: " + str(a.id) + " has target:" + str(agent_target_id), False, (255,255,255))
                 #screen.blit(text_target_id, (1750, 100 + (50*agent_list.index(a))))
 
+        print_number(i, (0,900))
+        print_number(fps, (0,950))
+        print_number(cost, (0,1000))
         pygame.display.flip()
         clock.tick(fps)
