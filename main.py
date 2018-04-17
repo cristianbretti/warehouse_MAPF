@@ -2,7 +2,7 @@ from orders import *
 from warehouse import warehouse
 from Agent import *
 from Worker import *
-from draw_simulation import draw
+#from draw_simulation import draw
 from functions import *
 
 from WHCA import *
@@ -10,8 +10,8 @@ from Simulation import *
 from DecisionTree import *
 
 def main():
-	order_input = big_temp[0]
-	number_of_agents = 5
+	order_input = simulate_8020_orders(random.randint(2,15), random.randint(1,4))
+	number_of_agents = 10
 	file_name = "data_for_" + str(number_of_agents) + "_agents.txt"
 
 	graph, pickup_nodes, drop_off_nodes = create_Astar_graph(warehouse)
@@ -27,8 +27,8 @@ def main():
 
 	#WHCA(graph, agents, 20, 10, workers)
 	dec_tree = DecisionTree(file_name)
-	sim = Simulation(graph, agents, workers, dec_tree)
-	sim.run()
+	#sim = Simulation(graph, agents, workers, dec_tree)
+	#sim.run()
 	#state, cost, done = sim.run()
 
 	# if state:
@@ -36,7 +36,7 @@ def main():
 	# 	print("cost so far %d" % (cost))
 	# 	print(done)
 
-	draw(agents, graph)
+	#draw(agents, graph)
 
 
 if __name__ == "__main__":

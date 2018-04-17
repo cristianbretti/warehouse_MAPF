@@ -1,4 +1,8 @@
 from sklearn import tree
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
 import numpy as np
 
 def get_x_vector_from_state(state):
@@ -37,9 +41,10 @@ class DecisionTree(object):
 
 		test_x = x[train_index:]
 		test_y = y[train_index:]
-		self.tree.fit(train_x, train_y)
 
+		self.tree.fit(train_x, train_y)
 		print("Tree score is: %.3f" % (self.tree.score(test_x, test_y)))
+
 
 	def get_rule(self, state):
 		x = get_x_vector_from_state(state)
