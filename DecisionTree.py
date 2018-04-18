@@ -56,5 +56,4 @@ class DecisionTree(object):
 	def get_rule(self, state):
 		x = get_x_vector_from_state(state)
 		prediction = int(self.tree.predict([x])[0])
-		print("The tree predicted rule: %d" % (prediction))
 		return prediction

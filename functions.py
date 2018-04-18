@@ -10,7 +10,10 @@ def get_correct_node(pickup_nodes, node_id):
             return current
     raise Exception('Could not find id:%d in the list of pickup_nodes' %(node_id))
 
-
+def assign_first_items(agents, workers):
+    for a in agents:
+        assign_item_to_agent(a, workers)
+        
 def create_workers(drop_off_nodes):
     return [Worker(node.id, node.coordinates) for node in drop_off_nodes]
 

@@ -16,6 +16,8 @@ class Simulation(object):
         self.workers = workers
         self.cost = 0
         self.dec_tree = dec_tree
+        self.fail_tree_rule_count = 0
+        self.crash_count = 0
         for agent in self.agents:
             if agent.pickup:
                 agent.path = AStar(self.graph, agent)
@@ -54,7 +56,7 @@ class Simulation(object):
                 if not self.dec_tree:
                     return state, self.cost, done
                 else:
-                    print("applying rule")
+                    self.crash_count += 1
                     self.apply_tree_rule(state)
 
             done = not one_agent_has_pickup(self.agents)
@@ -134,7 +136,7 @@ class Simulation(object):
             return
         else:
             #Ruled didn't work, randomly choose one that works
-            print("FAILED TO APPLY DEC TREE RULE")
+            self.fail_tree_rule_count += 1
             rules = [0,1,2,3,4]
             random.shuffle(rules)
             for j in range(0, 5):

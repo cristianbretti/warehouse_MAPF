@@ -93,6 +93,8 @@ def findPathAStar(graph, agent,start_pos, reservation_table, W, workers, K):
                 reset_f_val_graph(graph)
                 current.came_from = None
                 next_path = findPathAStar(graph, agent, current, reservation_table, W, workers, K+1-len(path_so_far))
+                if next_path == None:
+                    return None
                 return path_so_far + next_path[1:]
         else:
             reached_target_last_step = False
@@ -162,6 +164,10 @@ def WHCA(graph, agents, W, K, workers):
             reset_graph(graph)
 
             path = findPathAStar(graph, a, a.pos, reservation_table, W, workers, K)
+
+            if path == None:
+                return -1
+
             # Reserve path
             for time, value in enumerate(path):
                 if time <= W:
@@ -178,3 +184,8 @@ def WHCA(graph, agents, W, K, workers):
             a.move_on_path(K, a.pickup)
 
         reservation_table = dict()
+
+    total_cost = 0
+    for agent in agents:
+        total_cost += len(agent.walking_path)
+    return total_cost
