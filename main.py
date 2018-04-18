@@ -10,7 +10,7 @@ from Simulation import *
 from DecisionTree import *
 import random
 
-number_of_tests = 50
+number_of_tests = 500
 
 def main():
 	global number_of_tests
