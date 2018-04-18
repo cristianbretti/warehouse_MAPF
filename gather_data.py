@@ -44,8 +44,8 @@ def write_line_to_file(x, file):
 
 def main():
 	while True:
-		
-		order_input = simulate_8020_orders(random.randint(2,15), random.randint(1,4))
+
+		order_input = simulate_8020_orders(random.randint(2,15))
 	#for order_input in big_order_list:
 		print(order_input)
 		graph, pickup_nodes, drop_off_nodes = create_Astar_graph(warehouse)

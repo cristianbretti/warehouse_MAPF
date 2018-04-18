@@ -1,4 +1,5 @@
 import random
+import numpy as np
 from functions import *
 from warehouse import warehouse
 random.seed(9501020078)
@@ -37,29 +38,35 @@ right_pickups = [x.id for x in temp if x.id not in left_pickups]
 all_pickups = left_pickups + right_pickups
 
 
-def simulate_8020_orders(num_orders, average_item_per_order):
+def simulate_8020_orders(num_orders):
     orders = []
     for i in range(0, num_orders):
         current_order = []
+        num_items = int(np.random.exponential()) + 1
+        current_amount = 0
         while True:
             if random.random() > 0.2:
                 current_order.append(left_pickups[random.randint(0, len(left_pickups)-1)])
             else:
                 current_order.append(right_pickups[random.randint(0, len(right_pickups)-1)])
 
-            if random.randint(1, average_item_per_order) == average_item_per_order:
+            current_amount += 1
+            if current_amount == num_items:
                 orders.append(current_order)
                 break
     return orders
 
-def simulate_uniform_orders(num_orders, average_item_per_order):
+def simulate_uniform_orders(num_orders):
     orders = []
     for i in range(0, num_orders):
         current_order = []
+        num_items = int(np.random.exponential()) + 1
+        current_amount = 0
         while True:
             current_order.append(all_pickups[random.randint(0, len(all_pickups)-1)])
 
-            if random.randint(1, average_item_per_order) == average_item_per_order:
+            current_amount += 1
+            if current_amount == num_items:
                 orders.append(current_order)
                 break
     return orders
