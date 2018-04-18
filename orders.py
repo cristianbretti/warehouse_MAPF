@@ -44,13 +44,10 @@ def simulate_8020_orders(num_orders):
         current_order = []
         num_items = int(np.random.exponential()) + 1
         current_amount = 0
-        while True:
-            b = random.random()
-            print(b)
-            if b > 0.2:
+        while True: 
+            if random.random() > 0.2:
                 current_order.append(left_pickups[random.randint(0, len(left_pickups)-1)])
             else:
-                print("got in here")
                 current_order.append(right_pickups[random.randint(0, len(right_pickups)-1)])
 
             current_amount += 1
