@@ -2,7 +2,7 @@ import random
 import numpy as np
 from functions import *
 from warehouse import warehouse
-random.seed(9501020078)
+
 
 #small_order_list = [[104,104],[166,266,625],[920,1182,999],[1182,1319]]
 small_order_list = [[104,1182,357,206,453,1123]]

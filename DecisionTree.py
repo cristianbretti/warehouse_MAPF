@@ -4,6 +4,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 import numpy as np
+import random
 
 def get_x_vector_from_state(state):
 	x_vector = []
@@ -26,7 +27,13 @@ class DecisionTree(object):
 		file = open(self.file_name, 'r')
 		x = []
 		y = []
+		lines = []
 		for line in file:
+			lines.append(line)
+
+		random.shuffle(lines)
+
+		for line in lines:
 			elements = line.split()
 			one_y = elements.pop()
 			one_x = [int(elem) for elem in elements]
@@ -34,7 +41,7 @@ class DecisionTree(object):
 			y.append(one_y)
 
 		number_of_inputs = len(x)
-		train_index = int(number_of_inputs*0.8)
+		train_index = int(number_of_inputs*0.7)
 
 		train_x = x[:train_index]
 		train_y = y[:train_index]

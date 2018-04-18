@@ -4,8 +4,6 @@ from Simulation import *
 import random
 import gc
 
-random.seed(9611122319)
-
 
 min_so_far = 10**5
 min_node = None
