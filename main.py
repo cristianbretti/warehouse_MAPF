@@ -8,6 +8,7 @@ from functions import *
 from WHCA import *
 from Simulation import *
 from DecisionTree import *
+import random
 
 def main():
 	order_input = simulate_8020_orders(random.randint(2,15))

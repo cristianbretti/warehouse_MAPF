@@ -2,7 +2,6 @@ from AStar import *
 from functions import *
 import copy
 import random
-random.seed(9611122319)
 
 class State(object):
     def __init__(self, agent1, agent2, agents):

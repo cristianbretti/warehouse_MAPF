@@ -1,6 +1,7 @@
 import copy
 #from draw_simulation import draw
 from Simulation import *
+import numpy as np
 import random
 import gc
 

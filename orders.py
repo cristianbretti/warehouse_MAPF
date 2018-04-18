@@ -2,7 +2,7 @@ import random
 import numpy as np
 from functions import *
 from warehouse import warehouse
-
+import time
 
 #small_order_list = [[104,104],[166,266,625],[920,1182,999],[1182,1319]]
 small_order_list = [[104,1182,357,206,453,1123]]
@@ -45,9 +45,12 @@ def simulate_8020_orders(num_orders):
         num_items = int(np.random.exponential()) + 1
         current_amount = 0
         while True:
-            if random.random() > 0.2:
+            b = random.random()
+            print(b)
+            if b > 0.2:
                 current_order.append(left_pickups[random.randint(0, len(left_pickups)-1)])
             else:
+                print("got in here")
                 current_order.append(right_pickups[random.randint(0, len(right_pickups)-1)])
 
             current_amount += 1
