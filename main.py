@@ -12,7 +12,7 @@ from DecisionTree import *
 def main():
 	order_input = simulate_8020_orders(random.randint(2,15), random.randint(1,4))
 	number_of_agents = 10
-	file_name = "data_for_" + str(number_of_agents) + "_agents.txt"
+	file_name = "data_for_" + str(number_of_agents) + "_agents.input"
 
 	graph, pickup_nodes, drop_off_nodes = create_Astar_graph(warehouse)
 
