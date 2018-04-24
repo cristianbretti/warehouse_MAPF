@@ -60,6 +60,88 @@ class Crash(object):
 		self.cost = cost
 		self.done = done
 
+class RuleExpert(object):
+	def __init__(self):
+		self.min_so_far = 10**5
+		self.min_node = None
+		self.handled_crashes = dict()
+
+	def get_min_node(self):
+		return self.min_node
+
+	def build_tree(self, node, prevCost, crash_prev, crash_prev_agents=None, crash=None):
+		done = False
+
+		node.state, node.cost, done = node.simulation.run(min_so_far)
+
+		if done:
+			#print("Reached GOOD end of simulation")
+			node.leaf = True
+			if node.cost < min_so_far:
+				self.min_so_far = node.cost
+				self.min_node = node
+				gc.collect()
+			return node.cost
+
+		if node.cost >= min_so_far:
+			#print("already surpassed min so far")
+			node = None
+			return 10**5
+
+		if hash_crash(node.state, node.cost) in self.handled_crashes:
+			node.cost = self.handled_crashes[hash_crash(node.state, node.cost)]
+			node.leaf = True
+			return node.cost
+
+
+		if node.cost == prevCost + 1:
+			if crash_prev and (node.state.agent1.id, node.state.agent2.id) == crash_prev_agents:
+				#print("Reached BAD end of simulation, to many crashes in a row for same agents!")
+				node = None
+				return 10**5
+			else:
+				crash_prev = True
+				crash_prev_agents = (node.state.agent1.id, node.state.agent2.id)
+		else:
+			crash_prev = False
+			crash_prev_agents = None
+
+		#handled_crashes[hash_crash(node.state, node.cost)] = True
+		booked_items = get_booked_items(node.simulation.graph)
+
+		min = 10**5
+		rule_list = [0,1,2,3,4]
+		#random.shuffle(rule_list) # DON'T SHUFFLE HERE BECUZ OR DATA
+		for j in range(0, 5):
+			i = rule_list[j]
+			reset_booked(node.simulation.graph, booked_items)
+			#reset_graph(node.simulation.graph)
+			ok, new_path1, new_path2 = node.simulation.can_apply_rule(node.state, i)
+			if ok:
+				new_sim = create_new_sim_2(node.simulation)
+
+				child = RuleExpertNode(node.cost, new_sim, node, i)
+				copy1 = []
+				copy2 = []
+				if new_path1:
+					copy1 = new_path1.copy()
+					#copy3 = new_path1.copy()
+				if new_path2:
+					copy2 = new_path2.copy()
+					#copy4 = new_path2.copy()
+
+				child.simulation.apply_rule(node.state, i, copy1, copy2)
+
+				current = self.build_tree(child, node.cost, crash_prev, crash_prev_agents)
+				if current < min:
+					min = current
+				#node.children[i] = child
+			# else:
+			# 	print("rule %d did not work" % (i))
+
+		self.handled_crashes[hash_crash(node.state, node.cost)] = min
+		return min
+
 def build_tree(node, prevCost, crash_prev, crash_prev_agents=None, crash=None):
 	global min_so_far
 	global min_node
@@ -123,7 +205,7 @@ def build_tree(node, prevCost, crash_prev, crash_prev_agents=None, crash=None):
 
 	min = 10**5
 	rule_list = [0,1,2,3,4]
-	random.shuffle(rule_list)
+	#random.shuffle(rule_list) # DON'T SHUFFLE HERE BECUZ OR DATA
 	for j in range(0, 5):
 		i = rule_list[j]
 		reset_booked(node.simulation.graph, booked_items)

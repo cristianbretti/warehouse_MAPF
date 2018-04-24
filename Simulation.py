@@ -138,7 +138,7 @@ class Simulation(object):
             #Ruled didn't work, randomly choose one that works
             self.fail_tree_rule_count += 1
             rules = [0,1,2,3,4]
-            random.shuffle(rules)
+            #random.shuffle(rules) # DONT SHUFFLE HERE BECUZ TREE PLZ
             for j in range(0, 5):
                 i = rules[j]
                 ok, new_path1, new_path2 = self.can_apply_rule(state, i)

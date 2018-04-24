@@ -31,7 +31,7 @@ class DecisionTree(object):
 		for line in file:
 			lines.append(line)
 
-		random.shuffle(lines)
+		#random.shuffle(lines)
 
 		for line in lines:
 			elements = line.split()

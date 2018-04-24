@@ -4,9 +4,11 @@ from functions import *
 from rule_expert import *
 from Simulation import *
 import cProfile
+import _thread
+import random
 
 number_of_agents = 10
-file_name = "data_for_" + str(number_of_agents) + "_agents.txt"
+#file_name = "data_for_" + str(number_of_agents) + "_agents.txt"
 #big_order_list = simulate_big_order_list(uniform=False, num_simulations=1, num_orders=8, average_item_per_order=2)
 big_order_list = big_temp
 
@@ -42,12 +44,10 @@ def write_line_to_file(x, file):
 	file.write("\n")
 
 
-def main():
+def main_thread(thread_name, file_name):
 	while True:
-
-		order_input = simulate_8020_orders(random.randint(2,15))
-	#for order_input in big_order_list:
-		print(order_input)
+		print("One simulation STARTED by thread %d" % (thread_name))
+		order_input = simulate_8020_orders(random.randint(5,15))
 		graph, pickup_nodes, drop_off_nodes = create_Astar_graph(warehouse)
 
 		workers = create_workers(drop_off_nodes)
@@ -62,7 +62,9 @@ def main():
 		root_simulation = Simulation(graph, agents, workers)
 		root = RuleExpertNode(0, root_simulation)
 		init_build()
-		build_tree(root, 0, False)
+		#build_tree(root, 0, False)
+		rule_expert = RuleExpert()
+		rule_expert.build_tree(root, 0, False)
 
 
 		#print("Rules")
@@ -74,11 +76,25 @@ def main():
 		#print("min node_cost: %d " % (get_min_node().cost))
 		#
 		file = open(file_name, "a")
-		number_of_datas = extract_data(get_min_node(), file)
+		number_of_datas = extract_data(rule_expert.get_min_node(), file)
 		#print("%d number of datas added" % (number_of_datas))
-		print("One simulation DONE")
+		print("One simulation DONE by thread %d" % (thread_name))
 		file.flush()
 		file.close()
+
+def main():
+	file_name_1 = "data_for_" + str(number_of_agents) + "_agents_thread_1.txt"
+	file_name_2 = "data_for_" + str(number_of_agents) + "_agents_thread_2.txt"
+	file_name_3 = "data_for_" + str(number_of_agents) + "_agents_thread_3.txt"
+	file_name_4 = "data_for_" + str(number_of_agents) + "_agents_thread_4.txt"
+	try:
+		_thread.start_new_thread(main_thread, (1, file_name_1, ))
+		_thread.start_new_thread(main_thread, (2, file_name_2, ))
+		_thread.start_new_thread(main_thread, (3, file_name_3, ))
+	except:
+		print("Error on starting threads")
+
+	main_thread(4, file_name_4)
 
 if __name__ == "__main__":
 	#cProfile.run('main()')
