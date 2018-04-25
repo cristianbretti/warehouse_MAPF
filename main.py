@@ -2,7 +2,7 @@ from orders import *
 from warehouse import warehouse
 from Agent import *
 from Worker import *
-#from draw_simulation import draw
+from draw_simulation import draw
 from functions import *
 
 from WHCA import *
@@ -24,6 +24,7 @@ def main():
 
 	number_of_agents = 10
 	file_name = "data_for_" + str(number_of_agents) + "_agents.input"
+	#file_name = "more_new_data.txt"
 	dec_tree = DecisionTree(file_name)
 
 	for test_number in range(0, number_of_tests):
@@ -53,6 +54,8 @@ def main():
 		if current_WHCA_COST == -1:
 			impossible_problems += 1
 			continue
+
+		draw(agents_WHCA, graph_WHCA)
 
 
 		sim = Simulation(graph_DKBR, agents_DKBR, workers_DKBR, dec_tree)

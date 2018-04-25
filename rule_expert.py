@@ -74,6 +74,7 @@ class RuleExpert(object):
 
 		node.state, node.cost, done = node.simulation.run(min_so_far)
 
+
 		if done:
 			#print("Reached GOOD end of simulation")
 			node.leaf = True

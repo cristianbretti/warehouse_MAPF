@@ -1,3 +1,5 @@
+from WHCA import *
+
 class temp(object):
     def __init__(self, i):
         self.i = i
@@ -19,3 +21,7 @@ for i in range(0,3):
 
 print([x.i for x in list2[:3]])
 print([x.i for (index,x) in enumerate(list2[:3])])
+
+
+print(hash(5,5))
+print(hash(4,5))

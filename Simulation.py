@@ -22,6 +22,26 @@ class Simulation(object):
             if agent.pickup:
                 agent.path = AStar(self.graph, agent)
                 agent.walking_path = [agent.pos]
+        self.solve_first()
+
+    def solve_first(self):
+        agent1, agent2 = self.agents_will_collide_next_step()
+        while agent1:
+            current_state = State(agent1, agent2, self.agents)
+            for i in range(0, 5):
+                ok, path1, path2 =  self.can_apply_rule(current_state, i)
+                copy1 = []
+                copy2 = []
+                if path1:
+                    copy1 = path1.copy()
+                if path2:
+                    copy2 = path2.copy()
+                if ok:
+                    self.apply_rule(current_state, i, copy1, copy2)
+                    break
+
+            agent1, agent2 = self.agents_will_collide_next_step()
+
 
     def run(self, prev_cost_reached=None):
         done = False
