@@ -189,7 +189,7 @@ def main():
 	# except:
 	# 	print("Error on starting threads")
 
-	main_thread(1, file_name_1)
+	main_thread(3, file_name_3)
 
 if __name__ == "__main__":
 	#cProfile.run('main()')

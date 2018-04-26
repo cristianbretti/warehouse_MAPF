@@ -2,7 +2,7 @@ from orders import *
 from warehouse import warehouse
 from Agent import *
 from Worker import *
-from draw_simulation import draw
+#from draw_simulation import draw
 from functions import *
 
 from WHCA import *
@@ -10,7 +10,7 @@ from Simulation import *
 from DecisionTree import *
 import random
 
-number_of_tests = 1000
+number_of_tests = 1
 
 def main():
 	global number_of_tests
@@ -23,9 +23,15 @@ def main():
 	impossible_problems = 0
 
 	number_of_agents = 10
-	file_name = "data_for_" + str(number_of_agents) + "_agents.input"
-	#file_name = "more_new_data.txt"
+	#file_name = "data_for_" + str(number_of_agents) + "_agents.input"
+	file_name = "all_first.txt"
+	file_name2 = "all_coordinates.txt"
+	file_name3 = "all_coordinates_small.txt"
+	file_name4 = "all_area.txt"
 	dec_tree = DecisionTree(file_name)
+	dec_tree2 = DecisionTree(file_name2)
+	dec_tree3 = DecisionTree(file_name3)
+	dec_tree4 = DecisionTree(file_name4)
 
 	for test_number in range(0, number_of_tests):
 
@@ -55,7 +61,7 @@ def main():
 			impossible_problems += 1
 			continue
 
-		draw(agents_WHCA, graph_WHCA)
+		#draw(agents_WHCA, graph_WHCA)
 
 
 		sim = Simulation(graph_DKBR, agents_DKBR, workers_DKBR, dec_tree)
@@ -70,9 +76,13 @@ def main():
 		DKBR_total_failed_tree_rules += sim.fail_tree_rule_count
 
 	number_of_tests = number_of_tests - impossible_problems
+	if number_of_tests <= 0:
+		print("No simulations were successful")
 	avg_cost_WHCA = cost_WHCA / number_of_tests
 	avg_cost_DKBR = cost_DKBR / number_of_tests
-	avg_dec_tree_fail_ratio = DKBR_total_failed_tree_rules / DKBR_total_crashes
+	avg_dec_tree_fail_ratio = 0
+	if DKBR_total_crashes != 0:
+		avg_dec_tree_fail_ratio = DKBR_total_failed_tree_rules / DKBR_total_crashes
 
 	print("The average cost for WHCA: %.3f" % (avg_cost_WHCA))
 	print("The average cost for DKBR: %.3f" % (avg_cost_DKBR))
