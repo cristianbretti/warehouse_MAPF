@@ -22,18 +22,18 @@ def get_x_vector_from_state_first(state):
 		x_vector.append(agent.pos.id)
 	return x_vector
 
-def get_x_vector_from_state_area(state):
+def get_x_vector_from_state_area(state, graph):
 	x_vector = []
 	agent1 = state.agent1
 	agent2 = state.agent2
 
-	area_for_agent(x_vector, agent1, agent2, state.agents)
-	area_for_agent(x_vector, agent2, agent1, state.agents)
+	area_for_agent(x_vector, agent1, agent2, state.agents, graph)
+	area_for_agent(x_vector, agent2, agent1, state.agents, graph)
 
 
 	return x_vector
 
-def area_for_agent(x_vector, agent1, agent2, agents):
+def area_for_agent(x_vector, agent1, agent2, agents, graph):
 	neighbours = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
 	for (i,j) in neighbours:
 

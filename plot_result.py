@@ -112,7 +112,7 @@ difference_data[2] = np.subtract(data[0], data[2])
 #plot_markers(difference_data) # ONE OF THESE
 
 x = [1]
-f, (ax, ax2) = plt.subplots(2, 1, sharex=True)
+f, (ax, ax2) = plt.subplots(2, 1, sharex=True, gridspec_kw={'height_ratios':[4, 1]})
 
 y_DKBR = sum(tree_fail_data[1])-sum(tree_fail_data[0])
 y_misses = sum(tree_fail_data[0])
@@ -137,8 +137,8 @@ ax.plot((-d, +d), (-d, +d), **kwargs)        # top-left diagonal
 ax.plot((1 - d, 1 + d), (-d, +d), **kwargs)  # top-right diagonal
 
 kwargs.update(transform=ax2.transAxes)  # switch to the bottom axes
-ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)  # bottom-left diagonal
-ax2.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)  # bottom-right diagonal
+ax2.plot((-d, +d), (1 - d, 1 + 7.5*d), **kwargs)  # bottom-left diagonal
+ax2.plot((1 - d, 1 + d), (1 - d, 1 + 7.5*d), **kwargs)  # bottom-right diagonal
 
 ax.set_ylim(10000, 12000)  # outliers only
 ax2.set_ylim(0, 100)

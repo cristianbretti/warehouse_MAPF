@@ -39,7 +39,7 @@ def main():
 	#file_name = "all_first.txt"
 	file_name = "all_coordinates.input"
 	#file_name3 = "all_coordinates_small.txt"
-	#file_name4 = "all_area.txt"
+	#file_name4 = "all_area.input"
 	dec_tree = DecisionTree(file_name, file_type="coordinates")
 	#dec_tree2 = DecisionTree(file_name2)
 	#dec_tree3 = DecisionTree(file_name3)
@@ -135,7 +135,7 @@ def main():
 	item_size_file = open("item_size_2.txt", 'w')
 	write_line_to_file(input_size_items, item_size_file)
 	write_line_to_file(input_size_orders, item_size_file)
-	
+
 	item_size_file.close()
 
 	tree_fail_file = open("tree_fail_file_2.txt", 'w')

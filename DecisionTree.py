@@ -61,7 +61,7 @@ class DecisionTree(object):
 		print("Tree overfit score is %.3f" % (self.tree.score(train_x, train_y)))
 
 
-	def get_rule(self, state):
+	def get_rule(self, state, graph):
 		x = []
 		if self.file_type == "first":
 			x = get_x_vector_from_state_first(state)
@@ -70,7 +70,7 @@ class DecisionTree(object):
 		elif self.file_type == "coordinates_small":
 			x = get_x_vector_from_state_coordinates_small(state)
 		elif self.file_type == "area":
-			x = get_x_vector_from_state_area(state)
+			x = get_x_vector_from_state_area(state, graph)
 
 		prediction = int(self.tree.predict([x])[0])
 		return prediction

@@ -159,7 +159,7 @@ class Simulation(object):
         return None, self.cost, done
 
     def apply_tree_rule(self, state):
-        rule = self.dec_tree.get_rule(state)
+        rule = self.dec_tree.get_rule(state, self.graph)
         ok, new_path1, new_path2 = self.can_apply_rule(state, rule)
         if ok:
             self.apply_rule(state, rule, new_path1, new_path2)
