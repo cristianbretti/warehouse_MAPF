@@ -43,7 +43,7 @@ class Simulation(object):
             agent1, agent2 = self.agents_will_collide_next_step()
 
 
-    def run(self, prev_cost_reached=None):
+    def run(self, prev_cost_reached=None, is_rnd=False):
         done = False
         while(not done):
             for agent in self.agents:
@@ -73,7 +73,17 @@ class Simulation(object):
             agent1, agent2 = self.agents_will_collide_next_step()
             if agent1:
                 state = State(agent1, agent2, self.agents)
-                if not self.dec_tree:
+                if is_rnd:
+                    self.crash_count +=1
+                    rules = [0,1,2,3,4]
+                    for j in range(0, 5):
+                        i = random.randint(0,len(rules)-1)
+                        rules.pop(i)
+                        ok, new_path1, new_path2 = self.can_apply_rule(state, i)
+                        if ok:
+                            self.apply_rule(state, i, new_path1, new_path2)
+                            break
+                elif not self.dec_tree:
                     return state, self.cost, done
                 else:
                     self.crash_count += 1

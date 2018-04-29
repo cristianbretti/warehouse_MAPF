@@ -7,20 +7,13 @@ from sklearn.svm import SVC
 from sklearn.neural_network import MLPClassifier
 import numpy as np
 import random
-
-def get_x_vector_from_state(state):
-	x_vector = []
-	x_vector.append(state.agent1.pos.id)
-	x_vector.append(state.agent1.pickup.get_target().id)
-	x_vector.append(state.agent2.pos.id)
-	x_vector.append(state.agent2.pickup.get_target().id)
-	for agent in state.agents:
-		x_vector.append(agent.pos.id)
-	return x_vector
+from functions import *
 
 class DecisionTree(object):
-	def __init__(self, file_name, type=1):
+	def __init__(self, file_name, type=1, file_type="first"):
 		self.file_name = file_name
+		self.file_type = file_type
+		self.tree_score = 0
 		if type==1:
 			self.tree = tree.DecisionTreeClassifier()
 		elif type==2:
@@ -63,10 +56,21 @@ class DecisionTree(object):
 		test_y = y[train_index:]
 
 		self.tree.fit(train_x, train_y)
-		print("Tree score is: %.3f" % (self.tree.score(test_x, test_y)))
+		self.tree_score = self.tree.score(test_x, test_y)
+		print("Tree score is: %.3f" % (self.tree_score))
+		print("Tree overfit score is %.3f" % (self.tree.score(train_x, train_y)))
 
 
 	def get_rule(self, state):
-		x = get_x_vector_from_state(state)
+		x = []
+		if self.file_type == "first":
+			x = get_x_vector_from_state_first(state)
+		elif self.file_type == "coordinates":
+			x = get_x_vector_from_state_coordinates(state)
+		elif self.file_type == "coordinates_small":
+			x = get_x_vector_from_state_coordinates_small(state)
+		elif self.file_type == "area":
+			x = get_x_vector_from_state_area(state)
+
 		prediction = int(self.tree.predict([x])[0])
 		return prediction
