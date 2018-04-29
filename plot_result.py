@@ -11,54 +11,65 @@ def plot_data(results_x, prev_x=1, name=None):
     WHCA_line, = plt.plot(x, [p for p in results_x[0]],'C3', lw=0.8, label="WHCA*")
     plt.legend(handles=[WHCA_line, DKBR_line, Random_line])
     plt.ylabel("Cost")
-    plt.xlabel("Trial number")
+    plt.xlabel("Number of items")
     plt.title('Cost for each algorithm')
     if name:
         plt.savefig(name)
     plt.show()
 
-def plot_markers(results_x):
-    x = [i for i in range(1, len(results_x[0])+1)]
+def plot_markers(results_x, prev_x=1):
+    x = [i for i in range(prev_x, len(results_x[0])+prev_x)]
     DKBR_line, = plt.plot(x, [p for p in results_x[1]], 'C1.', lw=0.8, label="DKBR")
-    Random_line, = plt.plot(x, [p for p in results_x[2]], 'C2-', lw=0.8, label="Random")
-    WHCA_line, = plt.plot(x, [p for p in results_x[0]],'C3', lw=0.6, label="WHCA*")
+    Random_line, = plt.plot(x, [p for p in results_x[2]], 'C2*', lw=0.8, label="Random")
+    WHCA_line, = plt.plot(x, [p for p in results_x[0]],'C3-', lw=0.6, label="WHCA*")
     plt.legend(handles=[WHCA_line, DKBR_line, Random_line])
     plt.ylabel("Difference to WHCA*")
     plt.xlabel("Trial number")
     plt.show()
 
 
-result_file = open("results.txt", 'r')
-tree_fail_file = open("tree_fail_file.txt", 'r')
+#result_file = open("results.txt", 'r')
+#tree_fail_file = open("tree_fail_file.txt", 'r')
+result_file = open("results_2.input", 'r')
+tree_fail_file = open("tree_fail_file_2.intput", 'r')
+size_file = open("item_size_2.input", 'r')
 
 results_x = read_lines_from_file(result_file)
 tree_fail_x = read_lines_from_file(tree_fail_file)
+size_x = read_lines_from_file(size_file)
 
 
-major = sorted(zip(results_x[0],results_x[1],results_x[2], tree_fail_x[0], tree_fail_x[1],tree_fail_x[2]), key=lambda pair: pair[0])
+major = sorted(zip(results_x[0],results_x[1],results_x[2], tree_fail_x[0], tree_fail_x[1],tree_fail_x[2], size_x[0], size_x[1]), key=lambda pair: pair[6])
 
 data_first = []
-data_first.append([x for x, _, _, _, _, _ in major])
-data_first.append([x for _, x, _, _, _, _  in major])
-data_first.append([x for _, _, x, _, _, _  in major])
+data_first.append([x for x, _, _, _, _, _, _, _ in major])
+data_first.append([x for _, x, _, _, _, _, _, _  in major])
+data_first.append([x for _, _, x, _, _, _, _, _  in major])
 
 tree_fail_data = []
-tree_fail_data.append([x for _, _, _, x, _, _ in major])
-tree_fail_data.append([x for _, _, _, _, x, _  in major])
-tree_fail_data.append([x for _, _, _, _, _, x  in major])
+tree_fail_data.append([x for _, _, _, x, _, _, _, _ in major])
+tree_fail_data.append([x for _, _, _, _, x, _, _, _  in major])
+tree_fail_data.append([x for _, _, _, _, _, x, _, _  in major])
 
-max_count = 1
+size_data = []
+size_data.append([x for _, _, _, _, _, _, x, _  in major])
+size_data.append([x for _, _, _, _, _, _, _, x  in major])
+
+max_count = 10
 data = [[],[],[]]
 count = 0
 accum1 = 0
 accum2 = 0
 accum3 = 0
+
+prev_size = size_data[0][0]
 for i in range(0, len(data_first[0])):
     accum1 += data_first[0][i]
     accum2 += data_first[1][i]
     accum3 += data_first[2][i]
     count += 1
-    if count == max_count:
+    if size_data[0][i] != prev_size:
+    #if count == max_count:
         data[0].append(accum1/count)
         data[1].append(accum2/count)
         data[2].append(accum3/count)
@@ -66,6 +77,7 @@ for i in range(0, len(data_first[0])):
         accum2 = 0
         accum3 = 0
         count = 0
+        prev_size = size_data[0][i]
 
 if count != 0:
     data[0].append(accum1/count)
@@ -100,9 +112,9 @@ data5[2] = data[2][4*increment:len(data[2])]
 plot_data(data, name='all_tests.jpg') # THIS NOE
 #plot_data(data1)
 #plot_data(data2, increment)
-plot_data(data3, 2*increment, name='zoomed.jpg') # THIS ONE
+#plot_data(data3, 2*increment) # THIS ONE
 #plot_data(data4, 3*increment)
-#plot_data(data5, 4*increment)
+plot_data(data5, 4*increment, name='zoomed.jpg')
 
 difference_data = [[],[],[]]
 difference_data[0] = np.subtract(data[0], data[0])
@@ -140,7 +152,7 @@ kwargs.update(transform=ax2.transAxes)  # switch to the bottom axes
 ax2.plot((-d, +d), (1 - d, 1 + 7.5*d), **kwargs)  # bottom-left diagonal
 ax2.plot((1 - d, 1 + d), (1 - d, 1 + 7.5*d), **kwargs)  # bottom-right diagonal
 
-ax.set_ylim(10000, 12000)  # outliers only
+ax.set_ylim(10000, 11500)  # outliers only
 ax2.set_ylim(0, 100)
 
 ax.text(0.783, sum(tree_fail_data[1]) + 10, str(sum(tree_fail_data[1])), color='black', fontweight='bold')
@@ -156,16 +168,16 @@ plt.xticks([0.8, 1.2], ['DKBR', 'Random'])
 plt.savefig('number_of_collisions.jpg')
 plt.show()
 
-WHCA_avg = 896.698
-DKBR_avg = 901.076
-RND_avg = 900.523
+WHCA_avg = 893.754
+DKBR_avg = 897.999
+RND_avg = 898.293
 
 x = [1]
 ax = plt.subplot(111)
 ax.bar([0.8], [WHCA_avg],width=0.2,color='C3',align='center')
 ax.bar([1], [DKBR_avg],width=0.2,color='C1',align='center')
 ax.bar([1.2], [RND_avg],width=0.2,color='C2',align='center')
-ax.set_ylim(890, 902)  # outliers only
+ax.set_ylim(890, 900)  # outliers only
 
 ax.text(0.77, WHCA_avg + .25, str(WHCA_avg), color='C3', fontweight='bold')
 ax.text(0.97, DKBR_avg + .25, str(DKBR_avg), color='C1', fontweight='bold')
