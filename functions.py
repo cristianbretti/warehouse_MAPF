@@ -4,6 +4,14 @@ import numpy as np
 from Nodes import *
 #Init functions
 
+
+def get_item_size(order_input):
+    size = 0
+    for order in order_input:
+        size += len(order)
+    return size
+
+
 def get_x_vector_from_state_first(state):
 	x_vector = []
 	x_vector.append(state.agent1.pos.id)

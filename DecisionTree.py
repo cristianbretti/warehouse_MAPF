@@ -15,7 +15,7 @@ class DecisionTree(object):
 		self.file_type = file_type
 		self.tree_score = 0
 		if type==1:
-			self.tree = tree.DecisionTreeClassifier()
+			self.tree = tree.DecisionTreeClassifier(max_depth=15)
 		elif type==2:
 			self.tree = RandomForestClassifier()
 		elif type==3:

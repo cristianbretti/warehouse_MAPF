@@ -2,12 +2,12 @@ from WHCA import *
 from DecisionTree import *
 from functions import *
 
-file_name1 = "all_first.txt"
-file_name2 = "all_coordinates.txt"
-file_name3 = "all_coordinates_small.txt"
-file_name4 = "all_area.txt"
+file_name1 = "all_first.input"
+file_name2 = "all_coordinates.input"
+file_name3 = "all_coordinates_small.input"
+file_name4 = "all_area.input"
 
-f = open("all_first.txt", 'r')
+f = open("all_first.input", 'r')
 
 x = read_lines_from_file(f)
 
